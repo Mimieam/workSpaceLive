@@ -1,0 +1,40 @@
+{
+  "name": "minimscrb",
+  "version": "1.0.0",
+  "description": "mini math scrabble game",
+  "scripts": {
+    "cleanup": "rm -rf .cache dist",
+    "copy:static": "cp -r static/* dist/",
+    "copy": "npm run copy:static",
+    "prebuild": "rm -rf ./dist",
+    "build:chrome": "web-ext run --source-dir ./dist --target chromium",
+    "build": "node parcel.config.js && npm run copy",
+    "serve": "npm run cleanup && parcel start app/manifest.json --no-source-maps",
+    "start:chrome": "web-ext run --source-dir ./dist --target chromium",
+    "start": "npm run serve & npm run start:chrome"
+  },
+  "author": "Miezan Echimane",
+  "license": "MIT",
+  "dependencies": {
+    "hyperapp": "^2.0.4",
+    "mobx": "^5.15.4",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "tailwindcss": "^1.2.0",
+    "webextension-polyfill": "^0.6.0",
+    "ws": "3.3.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-0",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "@fullhuman/postcss-purgecss": "^2.1.2",
+    "parcel-bundler": "^1.12.4",
+    "parcel-plugin-web-extension": "^1.6.1",
+    "purgecss": "^2.1.2"
+  },
+  "resolutions": {
+    "ws": "3.3.2"
+  }
+}

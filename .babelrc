@@ -1,0 +1,17 @@
+{
+  "presets": [
+      ["@babel/preset-env", {
+        "modules": false,
+        "useBuiltIns": "usage",
+        "targets": {
+            "esmodules": true
+        }
+      }]
+  ],
+  "plugins": [
+      "@babel/plugin-transform-runtime",
+      "@babel/syntax-object-rest-spread",
+      "@babel/plugin-proposal-class-properties"
+  ],
+}
+

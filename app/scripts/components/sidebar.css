@@ -1,0 +1,21 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  height: 100vh;
+  @apply bg-red-900;
+}
+
+.sidebarButton {
+  align-items: center;
+  justify-content: center;
+  @apply rounded w-12 h-12 flex text-center content-center border-double border-4 text-orange-700 border-orange-700 bg-red-900;
+}
+
+.sidebarButton:hover {
+  @apply bg-teal-600;
+}
+
+.sidebarButton.add{
+  margin-top: auto;
+}

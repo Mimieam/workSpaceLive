@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+popup body is regulated by this css body...
+anything above 800px and 600px width is ignored...
+
+*/
+
+
+
+/***************************************************************
+**************************** Theme *****************************
+****************************************************************/
+:root {
+  --main-color: #95a5a6;
+  --accent-color: #7f8c8d;
+  --text-color: #ecf0f1;
+  --background-color: aliceblue;
+  --text-size: 15px;
+  --icon-size: 27px;
+  --button-height:35px;
+  --button-radius: 15px;
+}
+
+/* .lightTheme,
+.lightTheme .ts_theme {
+  --main-color: #95a5a6;
+  --accent-color: #7f8c8d;
+  --text-color: #ecf0f1;
+  --background-color: #FFF;
+  --background-color: aliceblue;
+  --text-size: 15px;
+  --icon-size: 27px;
+  --button-height:35px;
+}
+
+.darkTheme,
+.darkTheme .ts_theme {
+  --main-color: #566B7A;
+  --accent-color: #3B4A54;
+  --text-color: #A1B1B3;
+  --background-color: #4D606C;
+  --text-size: 15px;
+  --icon-size: 27px;
+  --button-height: 40px;
+} */
+
+html, body {
+  background: var(--background-color);
+  font-size: var(--text-size);
+  height: 100%;
+  @apply bg-gray-900
+}
+
+html{
+  /* scroll-margin: 30px; */
+  /* overscroll-behavior: auto contain; */
+}
+
+ body {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-grow: 2;
+  flex-basis: 0%;
+}
+
+body {
+  padding: 0 5px;
+  font-size: 30px;
+  /* color: tomato; */
+  font: 20px "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+html {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar {
+  display: none;
+}
+
