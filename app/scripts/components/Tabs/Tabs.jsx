@@ -1,9 +1,30 @@
 import React, { Component, useState } from 'react'
 import './tabs.css'
+import './../sidebar.css'
 
 export const Pane = props => {
-  return ( <div>{ props.children }</div> )
+  return (
+  <div className="card max-w-sm fixed top-0 left-0 rounded-lg overflow-hidden shadow-lg  bg-white ml-16 mr-2 my-2 h-90">
+    <div className=".rounded-t-lg px-6 py-2 text-right bg-gray-800 h-10 font-bold text-gray-200 text-xl mb-2">
+        Tab Header
+    </div>
+  <div className="px-6 py-4">
+    <div className="font-bold text-xl mb-2">Tabs Header</div>
+    <div className="text-gray-700 text-base">
+    { props.children }
+    </div>
+  </div>
+  <div className="px-6 py-4">
+    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#finance</span>
+    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#reseach</span>
+    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">#life</span>
+  </div>
+</div>
+)
 }
+ {/* <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+  { props.children } */}
+
 
 export const PaneHeader = props => {
   const { child, index, selected } = props
@@ -11,11 +32,12 @@ export const PaneHeader = props => {
 
   console.log(props)
   return (
-    <li className={ activeClass } onClick={ props.onClick}>
-      <a href="#"> {child.props.label} </a>
+    <li className={ `${activeClass} sidebarButton` } onClick={ props.onClick}>
+      <div> {child.props.label} </div>
     </li>
   )
 }
+
 
 export const Tabs = props => {
   const [selected, setSelected] = useState(0);
@@ -31,7 +53,12 @@ export const Tabs = props => {
   const renderHeaders = () => {
     console.log(props)
     return (
-      <ul> {headersComponents} </ul>
+      <div className="flex flex-col">
+        <ul> { headersComponents } </ul>
+        <div className={`add sidebarButton`} onClick={ props.onClick }>
+          +
+        </div>
+      </div>
     );
   }
 
@@ -42,69 +69,9 @@ export const Tabs = props => {
   }
 
   return (
-    <div>
+    <div className="bg-gray-200 sidebar  my-2 h-90">
       {renderHeaders()}
       {renderContent()}
     </div>
   )
 }
-
-
-// const Tab2s = React.createClass({
-//   displayName: 'Tabs',
-//   propTypes: {
-//     selected: React.PropTypes.number,
-//     children: React.PropTypes.oneOfType([
-//       React.PropTypes.array,
-//       React.PropTypes.element
-//     ]).isRequired
-//   },
-//   getDefaultProps() {
-//     return {
-//       selected: 0
-//     };
-//   },
-//   getInitialState() {
-//     return {
-//       selected: this.props.selected
-//     };
-//   },
-//   handleClick(index, event) {
-//     event.preventDefault();
-//     this.setState({
-//       selected: index
-//     });
-//   },
-//   _renderTitles() {
-//     function labels(child, index) {
-//       let activeClass = (this.state.selected === index ? 'active' : '');
-//       return (
-//         <li>
-//           <a href="#">
-//             {child.props.label}
-//           </a>
-//         </li>
-//       );
-//     }
-//     return (
-//       <ul>
-//         {this.props.children.map(labels.bind(this))}
-//       </ul>
-//     );
-//   },
-//   _renderContent() {
-//     return (
-//       <div>
-//         {this.props.children[this.state.selected]}
-//       </div>
-//     );
-//   },
-//   render() {
-//     return (
-//       <div>
-//         {this._renderTitles()}
-//         {this._renderContent()}
-//       </div>
-//     );
-//   }
-// });

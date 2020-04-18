@@ -54,13 +54,8 @@ html, body {
   @apply bg-gray-900
 }
 
-html{
-  /* scroll-margin: 30px; */
-  /* overscroll-behavior: auto contain; */
-}
-
- body {
-  justify-content: center;
+body {
+  /* justify-content: center; */
   align-items: center;
   display: flex;
   flex-grow: 2;
@@ -68,7 +63,7 @@ html{
 }
 
 body {
-  padding: 0 5px;
+  /* padding: 0 5px; */
   font-size: 30px;
   /* color: tomato; */
   font: 20px "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -82,3 +77,14 @@ html::-webkit-scrollbar {
   display: none;
 }
 
+#app{
+  width: 100vw;
+  max-width: 100%;
+}
+
+.card {
+  width: -webkit-fill-available;
+  max-width: -webkit-fill-available;
+  height: -webkit-fill-available;
+  max-height: -webkit-fill-available;
+}

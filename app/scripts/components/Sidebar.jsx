@@ -4,7 +4,7 @@ import './sidebar.css'
 const SidebarButton = props => {
   const { className } = props
   let _className = className ? className : ''
-
+  console.log(props)
   return (
     <div className={`${_className} sidebarButton`} onClick={ props.onClick }>
       { props.value }
