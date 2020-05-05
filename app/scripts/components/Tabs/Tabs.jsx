@@ -1,77 +1,134 @@
-import React, { Component, useState } from 'react'
+import React, { Fragment, useState, useEffect } from "react";
 import './tabs.css'
 import './../sidebar.css'
+import { WindowCard } from './../WindowCard'
+import { ReactSortable } from 'react-sortablejs'
+import {Sortable, AutoScroll} from 'sortablejs'
 
 export const Pane = props => {
+
+  useEffect(() => {
+    // Update the document title using the browser API
+    // const elements = Array.from(document.querySelectorAll('.windowCards'))
+
+    // elements.map(el => {
+    //   Sortable.create(el, {
+    //     group: {
+    //       name: 'disable-group-name',
+    //       // put: false,
+    //       // pull: 'clone'
+    //     },
+    //     fallbackOnBody: true,
+    //     easing: "cubic-bezier(1, 0, 0, 1)",
+    //     // swapThreshold: 0.65,
+    //     animation: 50,
+    //     ghostClass: 'ghost-background-class',
+    //     scroll: true, // Enable the plugin. Can be HTMLElement.
+    //     scrollSensitivity: 200, // px, how near the mouse must be to an edge to start scrolling.
+    //     scrollSpeed: 10, // px, speed of the scrolling
+    //     bubbleScroll: true
+    //   })
+    // })
+  })
+
   return (
-  <div className="card max-w-sm fixed top-0 left-0 rounded-lg overflow-hidden shadow-lg  bg-white ml-16 mr-2 my-2 h-90">
-    <div className=".rounded-t-lg px-6 py-2 text-right bg-gray-800 h-10 font-bold text-gray-200 text-xl mb-2">
-        Tab Header
+    <div className="card max-w-sm fixed top-0 left-0 rounded-lg overflow-hidden shadow-lg bg-white ml-16 mr-2 my-2 bg-gray-800">
+      <div className=".rounded-t-lg px-6 py-2 text-right bg-gray-800 h-10 font-bold text-gray-200 text-xl mb-2">
+          WorkSpaceLive 
+      </div>
+      {/* <ReactSortable
+        fallbackOnBody={ true}
+        easing={ "cubic-bezier(1, 0, 0, 1)"}
+        // swapThreshold={ 0.65,}
+        animation={ 50}
+        ghostClass={ 'ghost-background-class'}
+        scroll={ true}
+        scrollSensitivity={ 200 }
+        scrollSpeed={ 10 }
+        bubbleScroll={ true}
+        className={"windowCards"}> */}
+          <WindowCard {...props}/>
+          <WindowCard {...props}/>
+          <WindowCard {...props}/>
+          <WindowCard {...props}/>
+          <WindowCard {...props}/>
+          <WindowCard {...props}/>
+          <WindowCard {...props}/>
+          <WindowCard {...props}/>
+          <WindowCard {...props}/>
+          <WindowCard {...props}/>
+          <WindowCard {...props}/>
+          <WindowCard {...props}/>
+          <WindowCard {...props}/>
+          <WindowCard {...props}/>
+          <WindowCard {...props}/>
+          <WindowCard {...props}/>
+        {/* </ReactSortable> */}
     </div>
-  <div className="px-6 py-4">
-    <div className="font-bold text-xl mb-2">Tabs Header</div>
-    <div className="text-gray-700 text-base">
-    { props.children }
-    </div>
-  </div>
-  <div className="px-6 py-4">
-    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#finance</span>
-    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#reseach</span>
-    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">#life</span>
-  </div>
-</div>
-)
-}
- {/* <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-  { props.children } */}
-
-
-export const PaneHeader = props => {
-  const { child, index, selected } = props
-  const activeClass = (selected === index ? 'active' : '');
-
-  console.log(props)
-  return (
-    <li className={ `${activeClass} sidebarButton` } onClick={ props.onClick}>
-      <div> {child.props.label} </div>
-    </li>
   )
 }
+
+
+const SidebarButton = props => {
+  const { className } = props
+  let _className = className ? className : ''
+
+  return (
+    <div className={`${_className} sidebarButton`} onClick={ props.onClick }>
+      { props.value }
+    </div>
+  )
+}
+
 
 
 export const Tabs = props => {
   const [selected, setSelected] = useState(0);
-  // const headersComponents = props.children.map(PaneHeader.bind(this))
-  
-  const headersComponents = props.children.map((value, i) => <PaneHeader key={ i } child={ value } onClick={ () => onClickHandler(i) }/>);
-  
+  const [currentPane, setCurrentPane] = useState(0);
+
+  const workspaces = [1, 2, 3, 4, 5] 
+  const listOfWorkSpaceComponents = workspaces.map((value, i) => <SidebarButton key={i}  value={value} onClick={ () => onClickHandler(i) }/>);
+
   const onClickHandler = async (idx) => {
     await setSelected(idx)
-    console.log(selected)
   }
 
-  const renderHeaders = () => {
-    console.log(props)
+  const renderHeaders = (selected) => {
     return (
-      <div className="flex flex-col">
-        <ul> { headersComponents } </ul>
-        <div className={`add sidebarButton`} onClick={ props.onClick }>
-          +
-        </div>
+      <div className="sidebar ">
+        { listOfWorkSpaceComponents }
+        <SidebarButton key={"+"} value="+" className="add"/>
       </div>
     );
   }
 
-  const renderContent = () => {
+  const renderContent = (selected) => {
+    console.log("RenderContent - ", selected)
     return (
-      <div> {props.children[selected]} </div>
+      <Pane label={ selected } content={[]}/>
     );
   }
 
   return (
-    <div className="bg-gray-200 sidebar  my-2 h-90">
-      {renderHeaders()}
-      {renderContent()}
-    </div>
+    <Fragment>
+      {renderHeaders(selected)}
+      {renderContent(selected)}
+    </Fragment>
   )
 }
+
+
+
+
+  // let  ws = {
+  //   id:"",
+  //   name: "",
+  //   dimension: {
+  //     top, left, width, height
+  //   },
+  //   tabs: [{
+  //     id:"",
+  //     url:"",
+  //     title:""
+  //   }]
+  // }

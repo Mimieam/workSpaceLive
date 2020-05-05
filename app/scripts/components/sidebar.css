@@ -3,8 +3,9 @@
   margin-left: 8px;
   flex-direction: column;
   width: fit-content;
-  height: 100vh;
-  @apply bg-red-900;
+  height: 98.3vh;
+  margin: 1vh 8px;
+  @apply bg-red-900 rounded-lg flex flex-col ;
 }
 
 .sidebarButton {

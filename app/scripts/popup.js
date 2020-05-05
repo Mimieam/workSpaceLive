@@ -19,7 +19,6 @@ if (chrome && chrome.extension) {
   console.log("loaded");
 }
 
-
 var mountNode = document.getElementById("app");
 ReactDOM.render(<App name="Jane" />, mountNode);
 

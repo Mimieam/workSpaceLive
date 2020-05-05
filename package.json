@@ -8,8 +8,10 @@
     "copy": "npm run copy:static",
     "prebuild": "rm -rf ./dist",
     "build:chrome": "web-ext run --source-dir ./dist --target chromium",
+    "build:firefox-desktop": "web-ext run --source-dir ./dist --target firefox-desktop",
     "build": "node parcel.config.js && npm run copy",
     "serve": "npm run cleanup && parcel start app/manifest.json --no-source-maps",
+    "serve:dev": "npm run cleanup && parcel serve -p 3000 app/manifest.json",
     "start:chrome": "web-ext run --source-dir ./dist --target chromium",
     "start": "npm run serve & npm run start:chrome"
   },
@@ -18,8 +20,10 @@
   "dependencies": {
     "hyperapp": "^2.0.4",
     "mobx": "^5.15.4",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-dropzone": "^10.2.2",
+    "react-sortablejs": "^2.0.11",
     "tailwindcss": "^1.2.0",
     "webextension-polyfill": "^0.6.0"
   },
