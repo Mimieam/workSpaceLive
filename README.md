@@ -6,6 +6,13 @@ parcel build app/manifest.json --no-source-maps --experimental-scope-hoisting --
 # workSpaceLive
 
 
+
 TODO:
   - WindowCard
   
+  multiple context
+    a WorkeSpace ==> DragDropContext 
+        a Window ==> Droppable  
+           a Tab ==> Draggable  
+
+

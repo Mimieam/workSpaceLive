@@ -2,7 +2,10 @@
 import React from "react"
 import ReactDOM from "react-dom"
 // import styles from './../styles/main.css'
-import App from "./components/App"
+// import App from "./components/App"
+import App from "./components/App2"
+import browser from 'webextension-polyfill';
+// import App from "./___components/App"
 
 // import { h, app } from "hyperapp"
 // import { observable, autorun } from "mobx"
@@ -20,6 +23,6 @@ if (chrome && chrome.extension) {
 }
 
 var mountNode = document.getElementById("app");
-ReactDOM.render(<App name="Jane" />, mountNode);
+ReactDOM.render(<App/>, mountNode);
 
 

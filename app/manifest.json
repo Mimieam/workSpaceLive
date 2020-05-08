@@ -14,6 +14,8 @@
     ]
   },
   "permissions": [
+    "tabs",
+    "system.display",
     "activeTab",
     "clipboardWrite",
     "clipboardRead",
@@ -21,7 +23,10 @@
     "storage",
     "webRequest",
     "webRequestBlocking",
-    "<all_urls>"
+    "<all_urls>",
+    "chrome://favicon/",
+    "chrome://favicon2/*",
+    "chrome://*"
   ],
   "browser_action": {
     "default_icon": {
@@ -50,5 +55,5 @@
       "description": "Open all copied urls"
     }
   },
-  "content_security_policy": "script-src 'self' 'unsafe-eval' https://ssl.google-analytics.com; object-src 'self'"
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://ssl.google-analytics.com; object-src 'self'; img-src chrome://favicon;"
 }

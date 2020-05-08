@@ -2,6 +2,7 @@ import browser from 'webextension-polyfill';
 
 import { DEFAULT_OPTIONS } from './libs/datamodel';
 import { promisify } from './libs/utils';
+import { getOverlappingMonitor } from './libs/multiScreen';
 
 
 let DEBUG = true
@@ -10,27 +11,31 @@ let __clipboardContent = ''
 
 chrome.browserAction.onClicked.addListener(async() => {
     console.log('OPENING FROM BACKGROUND');
+    const currentMonitor = await getOverlappingMonitor()
+    console.log(currentMonitor)
     const parentWindow = await browser.windows.getCurrent();
     
 
     const parentConfig = {
-        'width': parseInt(window.screen.width * (3 / 4)),
-        'height': window.screen.height,
-        'left': 0,
-        'top': 0
+        'width': parseInt(currentMonitor.width * (3 / 4)),
+        'height': currentMonitor.height,
+        // 'height': parseInt(currentMonitor.height * (4 / 5)),
+        'left': currentMonitor.left,
+        'top': currentMonitor.top
     };
     const appConfig = {
-        'width': window.screen.width - parentConfig.width,
+        'width': currentMonitor.width - parentConfig.width,
         'height': parentConfig.height,
-        'left': parentConfig.width,
-        'top': 0
+        'left': currentMonitor.left + parentConfig.width,
+        'top': currentMonitor.top
     };
 
     if (OPENED_POPUP.length) {
-        const { popupId, parentId } = OPENED_POPUP[0]
+        console.log("OPENED_POPUP =", OPENED_POPUP)
+        const { popupWindowId, parentId } = OPENED_POPUP[0]
         let _parentId =  parentWindow.id != parentId ? parentWindow.id: parentId
-        console.log("_parentId = ",_parentId)
-        await chrome.windows.update(popupId, {drawAttention: true, ...appConfig }, (w) => console.log(w));
+        console.log("_parentId = ",_parentId, popupWindowId)
+        await chrome.windows.update(popupWindowId, {drawAttention: true, ...appConfig }, (w) => console.log(w));
         await chrome.windows.update(_parentId, {drawAttention: true, ...parentConfig }, (w) => console.log(w));
 
     } else {
@@ -43,7 +48,7 @@ chrome.browserAction.onClicked.addListener(async() => {
             await chrome.windows.update(parentWindow.id, { ...parentConfig }, (pW) => console.log(pW));
             OPENED_POPUP.push({
                 popupWindowId: appWindow.id,
-                popupId: appWindow.tabs[0].id,
+                popupTabId: appWindow.tabs[0].id,
                 parentId: parentWindow.id
             })
             console.log("OPENED_POPUP =", OPENED_POPUP)
@@ -51,9 +56,15 @@ chrome.browserAction.onClicked.addListener(async() => {
     }
 
     chrome.windows.onRemoved.addListener((id) => {
-        OPENED_POPUP = OPENED_POPUP.filter(x => x.popupId != id)
-        console.log("OPENED_POPUP =", OPENED_POPUP)
+        console.log("closing window id = ",id)
+        console.log(OPENED_POPUP)
+        OPENED_POPUP = OPENED_POPUP.filter(x => x.popupWindowId != id)
+        console.log("filtered after removed =", OPENED_POPUP)
     })
+
+
+    // chrome.developerPrivate.openDevTools({ extensionId: "nnlfihnjlcnpiddiilpmobjncpbhagnm" }, () => { console.log('DevTool Opened')})
+
 });
 
 /*
@@ -66,7 +77,10 @@ document.addEventListener('copy', (e) => {
     e.preventDefault();
 });
 
-const copyUrlsToClipboard = () => { }
+const copyUrlsToClipboard = () => {
+
+    
+ }
 
 const openUrls = async (_urls, windowId) => {
 
@@ -105,11 +119,11 @@ browser.commands.onCommand.addListener(async (command) => {
 
 browser.webRequest.onBeforeRequest.addListener((req) => {
     OPENED_POPUP.some(x => {
-        console.log(x.popupId,  req.tabId, x.popupId == req.tabId)
-        return x.popupId == req.tabId
+        console.log(x.popupTabId,  req.tabId, x.popupTabId == req.tabId)
+        return x.popupTabId == req.tabId
     })
     
-    if (OPENED_POPUP.some(x => x.popupId == req.tabId) && !req.url.includes('nnlfihnjlcnpiddiilpmobjncpbhagnm')) {
+    if (OPENED_POPUP.some(x => x.popupTabId == req.tabId) && !req.url.includes('nnlfihnjlcnpiddiilpmobjncpbhagnm')) {
         console.log("BLOCKED - ", req.url, req.tabId)
         return {redirectUrl: 'chrome-extension://nnlfihnjlcnpiddiilpmobjncpbhagnm/popup.html'};
         // return {cancel: true};
