@@ -2,8 +2,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
 // import styles from './../styles/main.css'
-// import App from "./components/App"
-import App from "./components/App2"
+import App from "./components/App"
 import browser from 'webextension-polyfill';
 // import App from "./___components/App"
 

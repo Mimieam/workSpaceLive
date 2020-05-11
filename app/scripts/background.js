@@ -18,8 +18,8 @@ chrome.browserAction.onClicked.addListener(async() => {
 
     const parentConfig = {
         'width': parseInt(currentMonitor.width * (3 / 4)),
-        'height': currentMonitor.height,
-        // 'height': parseInt(currentMonitor.height * (4 / 5)),
+        // 'height': currentMonitor.height,
+        'height': parseInt(currentMonitor.height * (4 / 5)),
         'left': currentMonitor.left,
         'top': currentMonitor.top
     };

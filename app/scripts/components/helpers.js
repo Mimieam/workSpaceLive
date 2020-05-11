@@ -9,54 +9,57 @@ export const promisify = (fn) => (...args) => new Promise((resolve, reject) => {
   });
 });
 
+// fake data generator
+export const getItems = (count, offset = 0) =>
+  Array.from({ length: count }, (v, k) => k).map(k => ({
+    id: `item-${k + offset}-${new Date().getTime()}`,
+    content: `item ${k + offset}`
+  }));
 
-const getFromDomStringThis = (cssAttribute, domString) => {
-  el = document.createElement('vDom')
-  el.innerHTML = domString 
-  data = el.querySelector(cssAttribute)
-  delete el
-  return data
-}
+export const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
 
-
-const fetchThis = (url) => {
-  return new Promise ((resolve, reject) => {
-    const xhr = new XMLHttpRequest()
-    xhr.open("GET", url, true)
-    xhr.onload = () => {
-      let status = xhr.status;
-      if (status == 200) {
-        resolve(xhr.response)
-      } else {
-        reject(`${status}`)
-      }
-    }
-    xhr.send()
-  })
-}
+  return result;
+};
 
 
+export  const getItemStyle = (isDragging, draggableStyle) => ({
+  // some basic styles to make the items look a bit nicer
+  userSelect: "none",
+  padding: `4px`,
+  margin: `0 0 1px 0`,
+  font: `1em`,
 
-class Scrapper {
+  // change background colour if dragging
+  background: isDragging ? "lightgreen" : "grey",
 
-  constructor() {
-    this.domString = ''
-    this._dom = ''
-  }
-  async load(pageUrl) {
-    this.domString = await fetchThis(pageUrl)
-    this._dom = document.createElement('_Dom')
-    this._dom.innerHTML = this.domString
-  }
+  // styles we need to apply on draggables
+  ...draggableStyle
+});
 
-  get(cssSelector) {
-    return this._dom.querySelector(cssSelector)
-  }
-  getDom() {
-    return this._dom
-  }
-}
-
-export default fetchThis
+export  const getListStyle = isDraggingOver => ({
+  background: isDraggingOver ? "lightblue" : "lightgrey",
+  padding: '2px',
+  width: '100%',
+  marginBottom: '5px' 
+});
 
 
+/**
+ * Moves an item from one list to another list.
+ */
+export  const move = (source, destination, droppableSource, droppableDestination) => {
+  const sourceClone = Array.from(source);
+  const destClone = Array.from(destination);
+  const [removed] = sourceClone.splice(droppableSource.index, 1);
+
+  destClone.splice(droppableDestination.index, 0, removed);
+
+  const result = {};
+  result[droppableSource.droppableId] = sourceClone;
+  result[droppableDestination.droppableId] = destClone;
+  console.log( result )
+  return result;
+};
