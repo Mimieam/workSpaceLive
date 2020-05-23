@@ -22,6 +22,7 @@
     "@emotion/core": "^10.0.27",
     "@emotion/styled": "^10.0.27",
     "axios": "^0.19.2",
+    "flow": "^0.2.3",
     "hyperapp": "^2.0.4",
     "mobx": "^5.15.4",
     "react": ">=16.3.0",
@@ -30,6 +31,7 @@
     "react-dropzone": "^10.2.2",
     "react-sortable-hoc": "^1.11.0",
     "react-sortablejs": "^2.0.11",
+    "recoil": "^0.0.7",
     "styled-components": "^3.2.6",
     "systeminformation": "^4.25.1",
     "tailwindcss": "^1.4.4",
@@ -37,10 +39,11 @@
     "webextension-polyfill": "^0.6.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.9.6",
+    "@babel/core": "^7.0.0-0",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-transform-runtime": "^7.9.6",
     "@babel/preset-env": "^7.9.6",
+    "@babel/preset-flow": "^7.9.0",
     "@fullhuman/postcss-purgecss": "^2.1.2",
     "autoprefixer": "^9.7.6",
     "parcel-bundler": "^1.12.4",

@@ -12,6 +12,6 @@
       "@babel/plugin-transform-runtime",
       "@babel/syntax-object-rest-spread",
       "@babel/plugin-proposal-class-properties"
-  ],
+  ]
 }
 

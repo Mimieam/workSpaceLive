@@ -54,15 +54,13 @@ html, body {
   @apply bg-gray-900
 }
 
+
 body {
-  /* justify-content: center; */
   align-items: center;
   display: flex;
   flex-grow: 2;
   flex-basis: 0%;
-}
-
-body {
+  color: #f8edeb;
   /* padding: 0 5px; */
   font-size: 30px;
   /* color: tomato; */
