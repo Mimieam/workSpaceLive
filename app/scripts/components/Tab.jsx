@@ -11,6 +11,7 @@ export const FavIcon = ({ url }) => {
     background: `url(chrome://favicon/size/16@x2/${ url }) no-repeat center`,
     height: "16px",
     width: "16px",
+    marginLeft: "5px",
   }
   return <div style={ _style }> </div>
 }
@@ -20,18 +21,22 @@ export const Tab_ = ({ item, state, setState, index, ind }) => {
 
   const [globalState, globalActions] = useGlobal();
   const _style_wrapper = {
-    height: '1em',
+    // height: '1em',
     display: "flex",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
     fontSize: "13px",
-    lineHeight: "1em",
-    backgroundColor: "#1a202c"
+    // lineHeight: "1em",
   },
-    _style_title = {
-      textOverflow: "ellipsis",
-      overflow: "hidden",
-      whiteSpace: "nowrap"
-    }
+  _style_title = {
+    textOverflow: "ellipsis",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    marginLeft: "15px",
+    maxWidth: "65%",
+  },
+  _style_buttons = {
+    marginLeft: "auto" ,
+  }
 
   return (
     <div style={ _style_wrapper }>
@@ -50,7 +55,11 @@ export const Tab_ = ({ item, state, setState, index, ind }) => {
       >
         delete
       </button> */}
-      <button type="button" onClick={ () => globalActions.addToCounter(1) }>
+      <button
+        style={_style_buttons}
+        type="button"
+        onClick={ () => globalActions.addToCounter(1) }
+      >
         +1 to global
       </button>
     </div>
@@ -68,7 +77,8 @@ export const Tab = ({ item, state, setState, index, ind }) => {
           ref={ provided.innerRef }
           { ...provided.draggableProps }
           { ...provided.dragHandleProps }
-          style={ getItemStyle(snapshot.isDragging, provided.draggableProps.style) }
+          className={ "tab" + `${snapshot.isDragging? ' isDragging':'' }` }
+          // style={ getItemStyle(snapshot.isDragging, provided.draggableProps.style) }
         >
           <Tab_
             item={ item }

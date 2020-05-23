@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import browser from 'webextension-polyfill';
 import { getItems, reorder, getItemStyle,getListStyle ,move } from './helpers'
@@ -75,30 +75,40 @@ export default function App() {
         { globalState.counter }
       </p>
       <div style={ { display: "flex", flexDirection: 'column' } }>
+      {/* <div className="windowCard px-4 py-2 border-orange-800 bg-gray-200 border-solid border-r-4 rounded-lg my-2 mx-3 shadow-md"> */}
+        {/* <div className="font-bold text-lg mb-2 border-solid border-gray-300 border-b-2 text-gray-800">Window ID = x </div> */}
+        {/* <div className="text-gray-700 text-base h-32 WCard"> */}
         <DragDropContext onDragEnd={ onDragEnd }>
           { state.map((el, ind) => (
             <Droppable key={ ind } droppableId={ `${ ind }` }>
               { (provided, snapshot) => (
+              <Fragment>
+                  <div className={ "windowTitle" }>WindowTitle</div>  
                 <div
-                  ref={ provided.innerRef }
-                  style={ getListStyle(snapshot.isDraggingOver) }
-                  { ...provided.droppableProps }
+                className={ "wrapper" + `${snapshot.isDraggingOver? ' isDragging':'' }` }
+                ref={ provided.innerRef }
+                // style={ getListStyle(snapshot.isDraggingOver) }
+                { ...provided.droppableProps }
                 >
                   { el.map((item, index) => (
                     <Tab
-                      key={ item.id }
-                      item={ item }
-                      index={ index }
-                      provided={provided }
-                      snapshot={ snapshot}
+                    key={ item.id }
+                    item={ item }
+                    index={ index }
+                    provided={provided }
+                    snapshot={ snapshot}
                     />
-                  )) }
+                    )) }
                   { provided.placeholder }
                 </div>
+              </Fragment>
               ) }
             </Droppable>
           )) }
         </DragDropContext>
+      
+      
+      {/* </div> */}
       </div>
     </div>
   );
