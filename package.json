@@ -21,6 +21,7 @@
     "@atlaskit/theme": "^9.5.3",
     "@emotion/core": "^10.0.27",
     "@emotion/styled": "^10.0.27",
+    "antd": "^4.2.5",
     "axios": "^0.19.2",
     "flow": "^0.2.3",
     "hyperapp": "^2.0.4",

@@ -4,6 +4,9 @@ import ReactDOM from "react-dom"
 // import styles from './../styles/main.css'
 import App from "./components/App"
 import browser from 'webextension-polyfill';
+
+import { RecoilRoot } from 'recoil';
+
 // import App from "./___components/App"
 
 // import { h, app } from "hyperapp"
@@ -22,6 +25,10 @@ if (chrome && chrome.extension) {
 }
 
 var mountNode = document.getElementById("app");
-ReactDOM.render(<App/>, mountNode);
+ReactDOM.render(
+  <RecoilRoot>
+    <App/>
+  </RecoilRoot>
+  , mountNode);
 
 

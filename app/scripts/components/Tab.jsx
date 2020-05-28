@@ -16,16 +16,12 @@ export const FavIcon = ({ url }) => {
   return <div style={ _style }> </div>
 }
 
-
 export const Tab_ = ({ item, state, setState, index, ind }) => {
 
   const [globalState, globalActions] = useGlobal();
   const _style_wrapper = {
-    // height: '1em',
     display: "flex",
-    // justifyContent: "space-between",
     fontSize: "13px",
-    // lineHeight: "1em",
   },
   _style_title = {
     textOverflow: "ellipsis",

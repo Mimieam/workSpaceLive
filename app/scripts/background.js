@@ -3,6 +3,7 @@ import browser from 'webextension-polyfill';
 import { DEFAULT_OPTIONS } from './libs/datamodel';
 import { promisify } from './libs/utils';
 import { getOverlappingMonitor } from './libs/multiScreen';
+import './libs/contextMenu'
 
 
 let DEBUG = true

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from "react";
+import React, { Component, useState, useEffect, Fragment } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import browser from 'webextension-polyfill';
 import { getItems, reorder, getItemStyle,getListStyle ,move } from './helpers'
@@ -7,6 +7,27 @@ import useGlobal from './store';
 import styled from '@emotion/styled';
 
 import '../../styles/main.css'
+
+
+const windowToWS = (windowsArr, name='ws') => {
+  const windows =  windowsArr.map( w => { 
+    const {height, width, top, left, id, tabs} = w
+    return {
+      id,
+      bounds: {height, width, top, left},
+      tabs: tabs.map(t=>{
+          const {url, title, id, pinned} = t
+          return {url, title, id, pinned}
+      })
+    }
+  })
+
+  const winCount = windows.length
+  const tabCount = windowsArr.reduce((acc, w) => { return acc + w.tabs.length }, 0)
+
+  return { name, windows, tabCount, winCount }  
+}
+
 
 export default function App() {
   const [state, setState] = useState([getItems(10), getItems(5, 10)]);
@@ -71,13 +92,11 @@ export default function App() {
   return (
     <div>
       <p>
-        counter:
+        WorkSpaceLive - counter:
         { globalState.counter }
       </p>
+      <div> LiveMode:[<input type="checkbox"></input>]</div>
       <div style={ { display: "flex", flexDirection: 'column' } }>
-      {/* <div className="windowCard px-4 py-2 border-orange-800 bg-gray-200 border-solid border-r-4 rounded-lg my-2 mx-3 shadow-md"> */}
-        {/* <div className="font-bold text-lg mb-2 border-solid border-gray-300 border-b-2 text-gray-800">Window ID = x </div> */}
-        {/* <div className="text-gray-700 text-base h-32 WCard"> */}
         <DragDropContext onDragEnd={ onDragEnd }>
           { state.map((el, ind) => (
             <Droppable key={ ind } droppableId={ `${ ind }` }>
@@ -106,9 +125,6 @@ export default function App() {
             </Droppable>
           )) }
         </DragDropContext>
-      
-      
-      {/* </div> */}
       </div>
     </div>
   );
