@@ -4,6 +4,25 @@
  */
 
 
+const windowToWS = (windowsArr, name='ws') => {
+  const windows =  windowsArr.map( w => { 
+    const {height, width, top, left, id, tabs} = w
+    return {
+      id,
+      bounds: {height, width, top, left},
+      tabs: tabs.map(t=>{
+          const {url, title, id, pinned} = t
+          return {url, title, id, pinned}
+      })
+    }
+  })
+
+  const winCount = windows.length
+  const tabCount = windowsArr.reduce((acc, w) => { return acc + w.tabs.length }, 0)
+
+  return { name, windows, tabCount, winCount }  
+}
+
 const _ws_structure = {
   name: '',
   windows: [{
@@ -22,19 +41,18 @@ const _ws_structure = {
   lastOpen: '',
 }
 
-export class WorkSpaceManager {
 
+export class WorkSpaceManager {
+  
   constructor(name = 'ws') {
     // an array of workspace name
-    this.name = `${name}`;
+    this.name = `somanytabs_${name}`;
     this.wsArr = this.loadWorkSpace() || [];
     this.count = this.wsArr.length;
-
     console.log('All Workspaces', this.wsArr);
   }
 
   loadWorkSpace() {
-
     console.log('loading WS');
     const ws = localStorage.getItem(this.name);
     if (ws) return JSON.parse(ws);
@@ -42,7 +60,6 @@ export class WorkSpaceManager {
   }
 
   addWorkSpace(name, wsStr) {
-
     //wsStr = stringified and compressed ws data
     const arr = [name].concat(this.wsArr);
     this.wsArr = Array.from(new Set(arr)); // deduplicate
@@ -58,19 +75,8 @@ export class WorkSpaceManager {
 
   openAWorkSpace(wsName) {
     if (wsName in this.wsArr) {
-      const ws = localStorage.getItem(wsName);
-      return ws
-    }
-    throw new Error(`Workspace "${wsName}" NOT FOUND`)
-  }
-
-  saveToWorkSpace(wsName, item) {
-    if (wsName in this.wsArr) {
-
       localStorage.getItem(wsName);
-      return true
     }
-    throw new Error(`Workspace "${wsName}" NOT FOUND`)
   }
 
   removeWorkSpace(nameToBeDeleted) {

@@ -9,6 +9,7 @@
 ## [~ Functionalities ~]
   - context Menu - 
       + add an open Tab to a WS 
+      + create a WS from current browser window
   - dragg and drop, sortable Tabs ( manually )
   - list multiple available WS
   - create a new WS from the current open windows
