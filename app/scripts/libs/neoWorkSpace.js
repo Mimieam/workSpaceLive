@@ -28,9 +28,17 @@ export class ws {
 
     ws.totalWSCount += 1
 
+    this.winCount = this.windows.length
+    this.tabCount = this.windows.reduce((acc, w) => { return acc + w.tabs.length }, 0)
+
     if (wsManager) {
       wsManager.add(this)
     }
+  }
+
+  refreshCounts() {
+    this.winCount = this.windows.length
+    this.tabCount = this.windows.reduce((acc, w) => { return acc + w.tabs.length }, 0)
   }
 
   static fromURLs(name, urls, meta = {}, returnRawWindow = false) {
@@ -62,7 +70,8 @@ export class ws {
     return _ws_structure
   }
 
-  static fromWindows(windowsArr, name) {
+  static fromWindows(windowsArr, name, manager) {
+
     const windows = windowsArr.map(w => {
       const { height, width, top, left, id, tabs } = w
       return {
@@ -74,11 +83,9 @@ export class ws {
         })
       }
     })
-    const winCount = windows.length
-    const tabCount = windowsArr.reduce((acc, w) => { return acc + w.tabs.length }, 0)
 
-    return new ws(name, windows, true)
-    // return { name, windows, tabCount, winCount }
+
+    return new ws(name, windows, true, manager)
   }
 
   isUrlInWS(url) {
@@ -120,6 +127,23 @@ export class ws {
     return new ws(name, windows, true)
   }
 
+  add(url) { 
+    this.windows?.[this.winCount - 1]?.tabs.push({
+      id: null,
+      url: url,
+      title: null,
+      pinned: null,
+      lastActive: null,
+    })
+    
+    this.refreshCounts()
+    console.log(`Added URL : ${ url } to ${this.name}`)
+  }
+  
+  remove(url) {
+    
+  }
+
 }
 
 
@@ -139,6 +163,7 @@ export const formatId = (name) => {
 export class wsManager {
 
   all = {}
+  name = "WSP_MANAGER"
 
   add(_ws) { 
     const _id = formatId(_ws.name)
@@ -147,11 +172,13 @@ export class wsManager {
     } else {
       this.all[_id] = _ws  
     }
+    this.save()
   }
 
   remove(nameOrId) {
     const _id = formatId(nameOrId)
     delete this.all[_id]
+    this.save()
   }
 
   get(nameOrId) {
@@ -160,11 +187,12 @@ export class wsManager {
   }
 
   save() {
-    localStorage.setItem(this.name, JSON.stringify());
+    const _all_ws_str = JSON.stringify(this.all)
+    localStorage.setItem(this.name, _all_ws_str);
+    return _all_ws_str
   }
-  loadWS() {
 
-  }
+  load() {}
 
 }
 
