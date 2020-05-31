@@ -105,12 +105,11 @@ const create_workspace_handler = async (info, tab) => {
   const _name = formatName(aNewWorkSpace.name)
 
   let menuComponent = { id: _id,  title: _name, act: (info, tab) => { console.log(`Menu component ${_id}`) }, menu:  generateUniqueSubMenu(WORKSPACEMENU, _id), }
-  // dynamicRootMenuWorkSpace.push(menuComponent)
+  dynamicRootMenuWorkSpace.push(menuComponent)
   CTX_MENU.updateMenu([menuComponent])
   // console.log(CTX_MENU, dynamicRootMenuWorkSpace)
   return aNewWorkSpace
 }
-
 
 const delete_workspace_handler = async (info, tab) => {
   console.log(`${ info.menuItemId } Clicked`)
@@ -121,13 +120,12 @@ const delete_workspace_handler = async (info, tab) => {
   const _id = formatId(wsName)
   WS_MANAGER.remove(_id)
   CTX_MENU.deleteMenu(_id)
+  dynamicRootMenuWorkSpace = dynamicRootMenuWorkSpace.filter( m => m.id != _id )
   // delete saved string
 
 }
 
 const CONTEXTS = ["page", "frame", "selection", "link", "editable", "image", "video", "audio"];
-
-
 
 const WORKSPACEMENU = [
   { id: 'add_fn', title: 'Add this tab', act: (info, tab) => { console.log('context Menu-> add_fn', info, tab, info.menuItemId); alert(`CLicked ${info.menuItemId}`) } },
@@ -144,43 +142,49 @@ const generateUniqueSubMenu = (m, parentName) => {
 const ROOTMENU = [
   { id: 'create_workspace', title: 'Create WorkSpace', act: create_workspace_handler },
   { id: 'delete_workspace', title: 'Delete WorkSpace', act: delete_workspace_handler },
-  { id: 'ws_1', title:'WS 1', act: (info, tab) => { console.log('Clicked WS_1', info, tab, info.menuItemId); alert('Clicked WS_1') }, menu: generateUniqueSubMenu(WORKSPACEMENU, 'WS_1') },
-  { id: 'ws_2', title:'WS 2', act: (info, tab) => { console.log('Clicked WS_1', info, tab, info.menuItemId); alert('Clicked WS_1') }, menu: generateUniqueSubMenu(WORKSPACEMENU, 'WS_2') },
-  { id: 'ws_3', title:'WS 3', act: (info, tab) => { console.log('Clicked WS_1', info, tab, info.menuItemId); alert('Clicked WS_1') }, menu: generateUniqueSubMenu(WORKSPACEMENU, 'WS_3') },
+  // { id: 'ws_1', title:'WS 1', act: (info, tab) => { console.log('Clicked WS_1', info, tab, info.menuItemId); alert('Clicked WS_1') }, menu: generateUniqueSubMenu(WORKSPACEMENU, 'WS_1') },
+  // { id: 'ws_2', title:'WS 2', act: (info, tab) => { console.log('Clicked WS_1', info, tab, info.menuItemId); alert('Clicked WS_1') }, menu: generateUniqueSubMenu(WORKSPACEMENU, 'WS_2') },
+  // { id: 'ws_3', title:'WS 3', act: (info, tab) => { console.log('Clicked WS_1', info, tab, info.menuItemId); alert('Clicked WS_1') }, menu: generateUniqueSubMenu(WORKSPACEMENU, 'WS_3') },
 ];
 
 let dynamicRootMenuWorkSpace = [
-  // { id: 'WS_1', act: (info, tab) => { console.log('Clicked WS_1', info, tab, info.menuItemId); alert('Clicked WS_1') }, menu: workSpaceMenu },
-]
+  { id: 'news', title:'news', act: (info, tab) => {}, menu: generateUniqueSubMenu(WORKSPACEMENU, 'news') },
+  { id: 'school', title:'school', act: (info, tab) => {}, menu: generateUniqueSubMenu(WORKSPACEMENU, 'school') },
+  { id: 'games', title:'games', act: (info, tab) => {}, menu: generateUniqueSubMenu(WORKSPACEMENU, 'games') },
+].sort(
+  (a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0)
+)
 
 export class ctxMenu {
 
   static listeners = {}
   static contexts = CONTEXTS
   
-  static workSpaceMenu = [];
+  static workSpaces = [];
   static rootMenu = [];
 
   constructor(listOfWorkSpaces = [], _wsMenu = [], _rootMenu = []) {
     this._reset()
 
     ctxMenu.rootMenu =  _rootMenu.length ? _rootMenu : ROOTMENU 
-    ctxMenu.workSpaceMenu = _wsMenu.length ? _wsMenu : WORKSPACEMENU 
-
+    this.workSpaces = []
     // append existing ws to the rootMenu
-    for (ws in listOfWorkSpaces) {
-      const { id, name} = ws
-      ctxMenu.rootMenu.push({
+    for (const ws of listOfWorkSpaces) {
+      let { id, name, title } = ws
+      name = name || title
+      WS_MANAGER.add({name: name, ...ws})
+      // console.log(name, title, formatName(name))
+      this.workSpaces.push({
         id: id,
-        title: name,
-        menu: generateUniqueSubMenu(ctxMenu.workSpaceMenu, id),
+        title: formatName(name),
+        menu: generateUniqueSubMenu(WORKSPACEMENU, id),
         act: (info, tab) => {
           console.log(`contextMenu::addNewWorkSpace -> ${ id }`, info, tab);
         },
       })
     }
     // create the chrome contextMenu from the rootMenu Array
-    this.createMenu(ctxMenu.rootMenu)
+    this.createMenu([...ctxMenu.rootMenu, ...this.workSpaces])
     this.setOnClickHandler()
   }
 
@@ -205,13 +209,13 @@ export class ctxMenu {
       // console.log(id, title, menu)
 
       if (id in ctxMenu.listeners) {
-        console.log(`create -> [Del] - exiting id: ${id}`)
+        // console.log(`create -> [Del] - exiting id: ${id}`)
         this.deleteMenu(id)
-      } 
+      }
 
       chrome.contextMenus.create({
         id: id,
-        title: title,
+        title: formatName(title),
         contexts: ctxMenu.contexts,
         parentId: root
       });
@@ -222,27 +226,31 @@ export class ctxMenu {
     }
   }
 
-  updateMenu(menu=[], root = null) {
-    // const _menu = [...ROOTMENU, ...dynamicRootMenuWorkSpace, ...menu]  // add all available menu
-    // console.log(_menu)
-    console.log(ctxMenu.rootMenu)
-    this.createMenu(menu)
+  updateMenu(menu = [], root = null) {
+
+    const _menu = [...ROOTMENU, ...dynamicRootMenuWorkSpace.sort( (a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0)) ]  // add all available menu
+    // const _menu = [ ...ROOTMENU, ...menu ]
+
+    console.log(_menu.map(m=>m.title))
+    // console.log(ctxMenu.rootMenu)
+    this.createMenu(_menu)
   }
   
   deleteMenu(id) {
     if (id in ctxMenu.listeners) {
-      console.log(`Deleting ${id} - listener`)
+      // console.log(`Deleting ${id} - listener`)
       delete ctxMenu.listeners[id]
       chrome.contextMenus.remove(id, () => {
         if (chrome.runtime.lastError) {
           // console.log("error : ", chrome.runtime.lastError.message);
         }
-        console.log(`DELETED - context menu ws - ${ id }`)
+        // console.log(`DELETED - context menu ws - ${ id }`)
       });
     }
   }
 }
 
 
-const listOfWorkSpaces = []
+const listOfWorkSpaces = dynamicRootMenuWorkSpace
+console.log(listOfWorkSpaces.map(i=>i.title))
 const CTX_MENU = new ctxMenu(listOfWorkSpaces, WORKSPACEMENU, ROOTMENU)
