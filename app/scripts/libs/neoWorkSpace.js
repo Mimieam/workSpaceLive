@@ -127,11 +127,11 @@ export class ws {
     return new ws(name, windows, true)
   }
 
-  add(url) { 
+  add(url, title=undefined) { 
     this.windows?.[this.winCount - 1]?.tabs.push({
       id: null,
       url: url,
-      title: null,
+      title: title || url,
       pinned: null,
       lastActive: null,
     })

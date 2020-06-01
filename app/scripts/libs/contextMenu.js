@@ -15,11 +15,10 @@ const interleave = ([ x, ...xs ], ys = []) =>
     : [ x, ...interleave (ys, xs) ]  // inductive: some x
 
 const genCtxMenuEntry = ({ _ws = {}, ctx=null, parentId=null, act=true, withSubmenu=false, id=null, title=null}) => {
-// const genCtxMenuEntry = (_ws, ctx, parentId = null, withSubmenu = false) => {
-  // console.log(_ws)
+
   const _id = formatId(_ws?.name || id)
   const _name = formatName(_ws?.name || title )
-  // console.log(_id, _name)
+  // console.log(`genCtxMenuEntry -> `,_name, withSubmenu)
   return {
     id: _id,
     title: _name,
@@ -39,7 +38,7 @@ const create_workspace_handler = async (info, tab) => {
   // const aNewWorkSpace = ws.fromWindows([win], wsName)
   const win = await browser.windows.getAll({populate:true})
   const aNewWorkSpace = ws.fromWindows(win, wsName)
-  console.log(aNewWorkSpace, win)
+
   WS_MANAGER.add(aNewWorkSpace)
 
   // const _id = formatId(aNewWorkSpace.name)
@@ -47,8 +46,8 @@ const create_workspace_handler = async (info, tab) => {
   
   let menuComponent = genCtxMenuEntry({_ws: aNewWorkSpace, ctx:null, parentId:null, withSubmenu:true})
   dynamicRootMenuWorkSpace.push(menuComponent)
+  console.log(dynamicRootMenuWorkSpace)
   
-  console.log(WS_MANAGER)
   CTX_MENU.updateMenu()
 
   return aNewWorkSpace
@@ -74,6 +73,15 @@ const WORKSPACEMENU = [
     id: 'add_fn', title: 'Add this tab', act: (info, tab) => {
       // console.log(WS_MANAGER, info, tab)
       WS_MANAGER.all[info.parentMenuItemId].add(info.pageUrl)
+
+      dynamicRootMenuWorkSpace = dynamicRootMenuWorkSpace.map(m => {
+        
+        return m.id != info.parentMenuItemId ? m :
+          {
+            ...m,
+            ...{menu: generateUniqueSubMenu(WORKSPACEMENU, info.parentMenuItemId)}
+          }
+      })
       CTX_MENU.updateMenu()
     }
   },
@@ -92,24 +100,25 @@ const WORKSPACEMENU = [
 
 // menu element need to have Unique IDs
 const generateUniqueSubMenu = (m, parentName) => {
-  console.log("ws_m", parentName, WS_MANAGER.get(parentName))
-  const arr1 = WS_MANAGER.get(parentName).windows.map(x => x.tabs.map(t => t.url))
+  const arr1 = WS_MANAGER.get(parentName).windows.map(x => x.tabs.map(t => {return {title:t.title, url: t.url}}))
   const arr2 = Array.from({ length: arr1.length - 1 }, () => '|') 
   const arr3 = interleave(arr1, arr2).flat().map(x => {
     if (x == '|') {
-      return[ {
+      return [{
         type: "separator"
       }, {
         type: "separator"
       }]
     }
     return {
-      id: `${Math.random(1) + 100}`,
-      name: x,
-      title: x
+      id: `${ Math.random(1) + 100 }`,
+      name: x.title,
+      title: x.title,
+      act: (info, tab) => { console.log('Opening URL - ', x.url) }
     }
-  }).flat()
-  console.log(arr3)
+    }).flat()
+  
+    console.log(`generateUniqueSubMenu -> `,parentName, m)
 
   return m.map(item => {
     return {
@@ -145,7 +154,7 @@ let dynamicRootMenuWorkSpace = [
 ].sort(
   (a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0)
 )
-
+window.dynamicRootMenuWorkSpace = dynamicRootMenuWorkSpace
 export class ctxMenu {
 
   static listeners = {}
@@ -161,7 +170,6 @@ export class ctxMenu {
     this.workSpaces = []
     // append existing ws to the rootMenu
     for (const w of entries) {
-      // console.log(w)
       this.workSpaces.push(w)
     }
     // create the chrome contextMenu from the rootMenu Array
@@ -184,41 +192,16 @@ export class ctxMenu {
   }
 
   createMenu(menu, root = null) {
-    console.log(menu, root)
+    console.log("createMenu ->", menu, root)
     
     for (let _m of menu) {
       let { id, title, menu, act, type, _ws } = _m
-      // console.log( id, title, menu, _m)
-      // console.log(_m, `${formatName(title)} ${_ws?`(${_ws.tabCount})`:''}`)
-      // let _ws_object = null
-      // // let tabs = []
-      // if (id in WS_MANAGER.all) {
-      //   _ws_object = WS_MANAGER.all[id]
-      //   console.log("_ws_object", _ws_object)
-      // //   tabs = _ws_object.tabs || []
-      // //   console.log('WS_MANAGER ==> ',_ws_object)
-      // }
 
       if (id in ctxMenu.listeners) {
         // console.log(`create -> [Del] - exiting id: ${id}`)
         this.deleteMenu(id)
       }
-      // let res = genCtxMenuEntry({
-      //   id: id,
-      //   title: formatName(title),
-      //   ctx: ctxMenu.contexts,
-      //   parentId: root,
-      //   act: false,
-      //   _ws: false,
-      //   // ctx: null, parentId: null, withSubmenu: true
-      // })
-      // console.log(res,         {
-      //   id: id,
-      //   // title: `${formatName(title)}`,
-      //   title: `${formatName(title)} ${_ws?`(${_ws.tabCount})`:''}`.trim(),
-      //   contexts: ctxMenu.contexts,
-      //   parentId: root
-      //   })
+
       chrome.contextMenus.create(
         
         (type == "separator") ? {
@@ -232,7 +215,7 @@ export class ctxMenu {
           parentId: root,
           act: false,
           _ws: false,
-          // ctx: null, parentId: null, withSubmenu: true
+          // ...(menu && { withSubmenu: true })
         })
         // {
         // id: id,
@@ -249,9 +232,11 @@ export class ctxMenu {
   }
 
   updateMenu(menu = [], root = null) {
-    const _menu = [...ROOTMENU, ...dynamicRootMenuWorkSpace.sort( (a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0)) ]  // add all available menu
 
-    console.log(_menu.map(m => m.title))
+    const _menu = [...ROOTMENU, ...dynamicRootMenuWorkSpace.sort( (a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0)) ]  // add all available menu
+    
+    console.log("UpdateMenu->", _menu.map(m => m.title))
+    // console.log(_menu.map(m => m.title))
     this.createMenu(_menu)
   }
   
