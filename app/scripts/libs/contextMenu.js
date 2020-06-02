@@ -141,16 +141,25 @@ const ROOTMENU = [
   { id: 'delete_workspace', title: 'Delete WorkSpace', act: delete_workspace_handler },
 ];
 
+const reloadSavedWS = () =>{
+  let  res = []
+  for (const [wsId,wsObj] of Object.entries(WS_MANAGER.all)){
+    console.log(wsId, wsObj)
+    res.push(genCtxMenuEntry({_ws: wsObj, ctx: null, parentId:null, withSubmenu:true}))
+  }
+
+  console.log(res)
+  if (res.length == 0) {
+    res.push(genCtxMenuEntry({_ws: ws.fromWindows([{ tabs: [] }], 'news', WS_MANAGER), ctx: null, parentId:null, withSubmenu:true}),
+    genCtxMenuEntry({_ws: ws.fromWindows([{ tabs: [] }], 'school', WS_MANAGER), ctx: null, parentId:null, withSubmenu:true}),
+    genCtxMenuEntry({_ws: ws.fromWindows([{ tabs: [] }], 'games', WS_MANAGER), ctx: null, parentId:null, withSubmenu:true}))
+  }
+
+  return res.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0))
+}
+
 let dynamicRootMenuWorkSpace = [
-  // ws.fromWindows([{tabs:[]}], 'news'),
-  // ws.fromWindows([{tabs:[]}], 'school'),  
-  // ws.fromWindows([{ tabs: [] }], 'games'),
-  genCtxMenuEntry({_ws: ws.fromWindows([{ tabs: [] }], 'news', WS_MANAGER), ctx: null, parentId:null, withSubmenu:true}),
-  genCtxMenuEntry({_ws: ws.fromWindows([{ tabs: [] }], 'school', WS_MANAGER), ctx: null, parentId:null, withSubmenu:true}),
-  genCtxMenuEntry({_ws: ws.fromWindows([{ tabs: [] }], 'games', WS_MANAGER), ctx: null, parentId:null, withSubmenu:true}),
-  // { id: 'news', title:'news', act: (info, tab) => {}, menu: generateUniqueSubMenu(WORKSPACEMENU, 'news'), _ws: ws.fromWindows([{name:'news', tabs:[]}],'news', ) },
-  // { id: 'school', title:'schoows.fromWindows([{ tabs: [] }], 'games')l', act: (info, tab) => {}, menu: generateUniqueSubMenu(WORKSPACEMENU, 'school'), _ws: ws.fromWindows([{name:'school', tabs:[]}],'school', ) },
-  // { id: 'games', title:'games', act: (info, tab) => {}, menu: generateUniqueSubMenu(WORKSPACEMENU, 'games'), _ws: ws.fromWindows([{name:'games', tabs:[]}],'games', ) },
+  ...reloadSavedWS(),
 ].sort(
   (a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0)
 )

@@ -13,14 +13,19 @@ import LZString from 'Lz-string'
 export class ws {
   static totalWSCount = 0
 
-  constructor(name, _windows = [], skip = false, wsManager=null) {
-    
+  constructor(name, _windows = [], skip = false, wsManager = null) {
+
     this.name = formatName(name)
+    this.wsManager = wsManager
 
     if (!skip) {
       _windows.forEach(w => {
-        const { meta, urls } = w
-        return this.fromURLs(this.name, urls, meta, returnRawWindow = true)
+        const { meta, urls, tabs } = w
+        console.log(w)
+        if (tabs != []) {
+          return ws.fromTabObj(this.name, tabs)
+        }
+        return ws.fromURLs(this.name, urls, meta, true)
       })
     }
 
@@ -32,13 +37,22 @@ export class ws {
     this.tabCount = this.windows.reduce((acc, w) => { return acc + w.tabs.length }, 0)
 
     if (wsManager) {
-      wsManager.add(this)
+      this.wsManager.add(this)
     }
   }
 
   refreshCounts() {
     this.winCount = this.windows.length
     this.tabCount = this.windows.reduce((acc, w) => { return acc + w.tabs.length }, 0)
+  }
+
+  static fromTabObj(name, tabs, meta = {}) {
+    return {
+      id: `meta_${ ws.totalWSCount }`,
+      bounds: [],
+      meta: meta,
+      tabs: tabs
+    }
   }
 
   static fromURLs(name, urls, meta = {}, returnRawWindow = false) {
@@ -96,16 +110,16 @@ export class ws {
   find(url) {
     // - find all occurence of an url in a WS - return an array of [{ windowIdx, tabindex, urlValue }]
     return this.windows.map((w, idx1) => {
-      return w.tabs.map((t, idx2) => t.url.includes(url) ? { w: idx1, t: idx2, url: t.url} : null).filter(i => i)
+      return w.tabs.map((t, idx2) => t.url.includes(url) ? { w: idx1, t: idx2, url: t.url } : null).filter(i => i)
     }).filter(i => i.length)
       .flat()
   }
 
   toString() {
-    return JSON.stringify({name, windows})
+    return JSON.stringify({ name, windows })
   }
 
-  save(toLocalStorage=false, compress=false) {
+  save(toLocalStorage = false, compress = false) {
     let wsStr = JSON.stringify({ name, windows })
 
     if (compress) {
@@ -127,7 +141,7 @@ export class ws {
     return new ws(name, windows, true)
   }
 
-  add(url, title=undefined) { 
+  add(url, title = undefined) {
     this.windows?.[this.winCount - 1]?.tabs.push({
       id: null,
       url: url,
@@ -135,13 +149,14 @@ export class ws {
       pinned: null,
       lastActive: null,
     })
-    
+
     this.refreshCounts()
-    console.log(`Added URL : ${ url } to ${this.name}`)
+    console.log(`Added URL : ${ url } to ${ this.name }`)
+    this.wsManager.save()
   }
-  
+
   remove(url) {
-    
+
   }
 
 }
@@ -154,7 +169,7 @@ export const formatName = (name) => {
 
 export const formatId = (name) => {
   let id = name.trim().replace(/\s/g, '_').toLowerCase()
-  return  id
+  return id
 }
 
 
@@ -165,12 +180,17 @@ export class wsManager {
   all = {}
   name = "WSP_MANAGER"
 
-  add(_ws) { 
+  constructor() {
+    this.load()
+    this.all
+  }
+
+  add(_ws) {
     const _id = formatId(_ws.name)
     if (_id in this.all) {
-      throw new Error(`The Workspace name:'${_ws.name}', id:'${_id} '- already in used`)
+      console.log(`The Workspace name:'${ _ws.name }', id:'${ _id } '- already in used`)
     } else {
-      this.all[_id] = _ws  
+      this.all[_id] = _ws
     }
     this.save()
   }
@@ -181,18 +201,46 @@ export class wsManager {
     this.save()
   }
 
+  reHydrate({ name = "", windows = [], winCount = 0, tabCount = 0 }) {
+    return new ws(name, windows, false, wsManager = this)
+  }
+
   get(nameOrId) {
     const _id = formatId(nameOrId)
     return this.all[_id]
   }
 
   save() {
-    const _all_ws_str = JSON.stringify(this.all)
+    // const _all_ws_str = JSON.stringify(this.all)
+    // localStorage.setItem(this.name, _all_ws_str);
+    // console.log("Saved wsManager =>", _all_ws_str)
+    // return _all_ws_str
+    let toBeSaved = {}
+    for (const [wsId, wsObj] of Object.entries(this.all)) {
+      toBeSaved[wsId] = { ...wsObj, ...{ wsManager: null } }  // remove the wsManager to not have a circular dependency while stringifying all this
+    }
+
+    const _all_ws_str = JSON.stringify(toBeSaved)
     localStorage.setItem(this.name, _all_ws_str);
-    return _all_ws_str
+    console.log("Saved wsManager =>", _all_ws_str)
+
   }
 
-  load() {}
+  load() {
+    const _all_ws_str = localStorage.getItem(this.name)
+    
+    if (_all_ws_str ){
+      const saved = JSON.parse(_all_ws_str)
+      console.log(saved)
+      let _all = []
+      for (const [wsId, wsObj] of Object.entries(saved)) {
+        console.log(wsId, wsObj)
+        this.reHydrate(wsObj)
+      }
+      console.log("reLoading wsManager =>", this.all)
+    }
+  }
+
 
 }
 
