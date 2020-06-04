@@ -1,4 +1,5 @@
 import LZString from 'Lz-string'
+import { openTab } from './helpers'
 
 /**
  * windowsArr = await ts2.browser.windows.getAll({populate:true})
@@ -120,14 +121,17 @@ export class ws {
   }
 
   save(toLocalStorage = false, compress = false) {
-    let wsStr = JSON.stringify({ name, windows })
+    let wsStr = JSON.stringify({ name: this.name, windows: this.windows })
 
     if (compress) {
       console.log("Size of sample is: " + wsStr.length);
       var compressed = LZString.compressToUTF16(wsStr);
       console.log("Size of compressed sample is: " + compressed.length);
+      var compressed = LZString.compress(wsStr);
+      console.log("Size of compressed sample is: " + compressed.length);
       var compressed = LZString.compressToUint8Array(wsStr);
       console.log("Size of compressed sample is: " + compressed.length);
+      wsStr = compressed
     }
 
     if (toLocalStorage) {
@@ -159,6 +163,15 @@ export class ws {
 
   }
 
+  open() {
+    this.windows.map(w => {
+      openTab({
+        urls: w.tabs.map(t=>t.url)
+      })
+    })
+  }
+
+
 }
 
 
@@ -182,7 +195,7 @@ export class wsManager {
 
   constructor() {
     this.load()
-    this.all
+    this.noSave = false
   }
 
   add(_ws) {
@@ -192,13 +205,19 @@ export class wsManager {
     } else {
       this.all[_id] = _ws
     }
-    this.save()
+    if (!this.noSave) {
+      this.save()
+    }
   }
 
   remove(nameOrId) {
     const _id = formatId(nameOrId)
     delete this.all[_id]
     this.save()
+  }
+
+  open(id) {
+    this.all[_id].open()
   }
 
   reHydrate({ name = "", windows = [], winCount = 0, tabCount = 0 }) {
@@ -217,6 +236,8 @@ export class wsManager {
     // return _all_ws_str
     let toBeSaved = {}
     for (const [wsId, wsObj] of Object.entries(this.all)) {
+      wsObj.save(true, true)
+      console.log("sub save done")
       toBeSaved[wsId] = { ...wsObj, ...{ wsManager: null } }  // remove the wsManager to not have a circular dependency while stringifying all this
     }
 
@@ -227,8 +248,9 @@ export class wsManager {
   }
 
   load() {
+    this.noSave = true
     const _all_ws_str = localStorage.getItem(this.name)
-    
+
     if (_all_ws_str ){
       const saved = JSON.parse(_all_ws_str)
       console.log(saved)
@@ -239,6 +261,7 @@ export class wsManager {
       }
       console.log("reLoading wsManager =>", this.all)
     }
+    this.noSave = false
   }
 
 

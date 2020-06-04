@@ -46,3 +46,39 @@ const findAndCloseDuplicateTabs = (_tabs = null) => {
     closeTabs(duplicates);
     return uniqueTabsArr
 };
+
+const discardThisTab = (tabId) => {
+    new Promise((resolve) => { 
+        chrome.tabs.onUpdated.addListener(async function listener(tabId, info) {
+            if (info.status === 'complete' && tabId === tab.id) {
+                await chrome.tabs.discard(tab.id, (discaredTab) => {
+                    console.log(`created & Unloaded from mem -> ${tab.url}`)
+                })
+                chrome.tabs.onUpdated.removeListener(listener);
+                resolve(tab);
+            }
+        })
+    })
+}
+
+
+export const openTab = async ({ urls = [], wID = null, meta = {}}) => {
+    // const t = await browser.tabs.create({ url:_url, windowId: windowId })
+    let t 
+    if (wID) {
+        t = new Promise((resolve) => {
+            chrome.tabs.create({ url:urls, windowId: wID , ...meta}, async(tab) => {
+                resolve(tab);
+            });
+        })
+    } else {
+        t = new Promise((resolve) => {
+            chrome.windows.create({ url: urls, ...meta }, async (w) => {
+                console.log(w)
+                resolve(w);
+            });
+        });
+    }
+
+    return t;
+}

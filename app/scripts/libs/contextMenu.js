@@ -14,7 +14,7 @@ const interleave = ([ x, ...xs ], ys = []) =>
     ? ys                             // base: no x
     : [ x, ...interleave (ys, xs) ]  // inductive: some x
 
-const genCtxMenuEntry = ({ _ws = {}, ctx=null, parentId=null, act=true, withSubmenu=false, id=null, title=null}) => {
+const genCtxMenuEntry = ({ _ws = {}, ctx=null, parentId=null, act=true, withSubmenu=false, id=null, title=null, type='normal'}) => {
 
   const _id = formatId(_ws?.name || id)
   const _name = formatName(_ws?.name || title )
@@ -26,6 +26,8 @@ const genCtxMenuEntry = ({ _ws = {}, ctx=null, parentId=null, act=true, withSubm
     ...(withSubmenu && { menu: generateUniqueSubMenu(WORKSPACEMENU, _id) }),
     ...(ctx && {contexts: ctx}),
     parentId: parentId,
+    type: type,
+    ...(type == 'checkbox' && { checked: true }),
     // ...(parentId && {parentId: parentId}),
     ...(_ws && {_ws: _ws})
   }
@@ -71,11 +73,9 @@ const CONTEXTS = ["page", "frame", "selection", "link", "editable", "image", "vi
 const WORKSPACEMENU = [
   {
     id: 'add_fn', title: 'Add this tab', act: (info, tab) => {
-      // console.log(WS_MANAGER, info, tab)
       WS_MANAGER.all[info.parentMenuItemId].add(info.pageUrl)
 
       dynamicRootMenuWorkSpace = dynamicRootMenuWorkSpace.map(m => {
-        
         return m.id != info.parentMenuItemId ? m :
           {
             ...m,
@@ -88,14 +88,16 @@ const WORKSPACEMENU = [
   { id: 'remove_fn', title: 'Remove this tab', act: (info, tab) => { console.log('context Menu-> remove_fn', info, tab, info.menuItemId); alert('Clicked ItemG') } },
   {
     id: 'peek_fn', title: 'Peek',
-    act: (info, tab) => {
-      console.log('context Menu-> peek_fn', info, tab, info.menuItemId); alert('context Menu-> peek_fn')
-    },
-    menu: [
-      
-    ]
+    act: (info, tab) => {console.log('context Menu-> peek_fn', info, tab, info.menuItemId)},
+    menu: []
   },
-  { id: 'open_fn', title: 'Open', act: (info, tab) => { console.log('context Menu-> open_fn', info, tab, info.menuItemId); alert('context Menu-> open_fn') } },
+  {
+    id: 'open_fn', title: 'Open', act: (info, tab) => {
+      WS_MANAGER.all[info.parentMenuItemId].open()
+      // openTab({urls:[]})
+      console.log('context Menu-> open_fn', info, tab, info.menuItemId); alert('context Menu-> open_fn')
+    }
+  },
 ];
 
 // menu element need to have Unique IDs
@@ -136,9 +138,16 @@ const generateUniqueSubMenu = (m, parentName) => {
   })
 }
 
+const OPTIONMENU = [
+  { id: "focus_option", type: "checkbox", checked:false,  title: "Focus ( Temporarily close other tabs )", act: (info, tab) => {  console.log(info, tab)}},
+  { id: "discard_option", type: "checkbox", checked:false,  title: "Discard Tabs on Open", act: (info, tab) => {  console.log(info, tab)}}
+]
+
 const ROOTMENU = [
   { id: 'create_workspace', title: 'Create WorkSpace', act: create_workspace_handler },
   { id: 'delete_workspace', title: 'Delete WorkSpace', act: delete_workspace_handler },
+  { id: 'option', title: 'Options', menu: OPTIONMENU },
+  {type: 'separator'},
 ];
 
 const reloadSavedWS = () =>{
@@ -148,7 +157,6 @@ const reloadSavedWS = () =>{
     res.push(genCtxMenuEntry({_ws: wsObj, ctx: null, parentId:null, withSubmenu:true}))
   }
 
-  console.log(res)
   if (res.length == 0) {
     res.push(genCtxMenuEntry({_ws: ws.fromWindows([{ tabs: [] }], 'news', WS_MANAGER), ctx: null, parentId:null, withSubmenu:true}),
     genCtxMenuEntry({_ws: ws.fromWindows([{ tabs: [] }], 'school', WS_MANAGER), ctx: null, parentId:null, withSubmenu:true}),
@@ -164,6 +172,7 @@ let dynamicRootMenuWorkSpace = [
   (a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0)
 )
 window.dynamicRootMenuWorkSpace = dynamicRootMenuWorkSpace
+
 export class ctxMenu {
 
   static listeners = {}
@@ -224,15 +233,8 @@ export class ctxMenu {
           parentId: root,
           act: false,
           _ws: false,
-          // ...(menu && { withSubmenu: true })
+          type: type || 'normal'
         })
-        // {
-        // id: id,
-        // // title: `${formatName(title)}`,
-        // title: `${formatName(title)} ${_ws?`(${_ws.tabCount})`:''}`.trim(),
-        // contexts: ctxMenu.contexts,
-        // parentId: root
-        // }
       );
         
       if (act) { ctxMenu.listeners[id] = act }
