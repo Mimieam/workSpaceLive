@@ -1,5 +1,5 @@
 import LZString from 'Lz-string'
-import { openTab } from './helpers'
+import { openTab, currentDate } from './helpers'
 
 /**
  * windowsArr = await ts2.browser.windows.getAll({populate:true})
@@ -244,7 +244,8 @@ export class wsManager {
     const _all_ws_str = JSON.stringify(toBeSaved)
     localStorage.setItem(this.name, _all_ws_str);
     console.log("Saved wsManager =>", _all_ws_str)
-
+    
+    return _all_ws_str
   }
 
   load() {
@@ -254,7 +255,7 @@ export class wsManager {
     if (_all_ws_str ){
       const saved = JSON.parse(_all_ws_str)
       console.log(saved)
-      let _all = []
+
       for (const [wsId, wsObj] of Object.entries(saved)) {
         console.log(wsId, wsObj)
         this.reHydrate(wsObj)
@@ -264,6 +265,10 @@ export class wsManager {
     this.noSave = false
   }
 
+  export() {
+    const dataString = this.save()
+    saveToFile(`workSpace_backup_${currentDate()}.txt`, dataString)
+  }
 
 }
 

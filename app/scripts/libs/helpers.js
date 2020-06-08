@@ -1,3 +1,5 @@
+import { saveAs } from 'file-saver'
+
 /**
  * close any empty tabs
  *
@@ -82,3 +84,22 @@ export const openTab = async ({ urls = [], wID = null, meta = {}}) => {
 
     return t;
 }
+
+// thanks to https://levelup.gitconnected.com/generate-unique-id-in-the-browser-without-a-library-50618cdc3cb1 :) 
+export function randomId(){
+    const uint32 = window.crypto.getRandomValues(new Uint32Array(1))[0];
+    return uint32.toString(16);
+}
+
+const saveToFile = (filename, dataString) => {
+    const blob = new Blob([dataString], { type: 'text/plain;charset=utf-8' });
+    // saveAs is from FileSaver.js
+    saveAs(blob, filename);
+};
+
+const currentDate = () => {
+    let date = new Date()
+    date = date.toLocaleDateString(undefined, {day:'2-digit'}) + '-' + date.toLocaleDateString(undefined, {month:'short'}) + '-' + date.toLocaleDateString(undefined, {year:'numeric'})
+    return date
+}
+

@@ -6,50 +6,51 @@
 
 import WS_MANAGER, { ws, formatId, formatName } from './neoWorkSpace'
 import browser from 'webextension-polyfill';
+import { randomId } from './helpers'
 
 window.WS_MANAGER = WS_MANAGER
 
-const interleave = ([ x, ...xs ], ys = []) =>
+const interleave = ([x, ...xs], ys = []) =>
   x === undefined
     ? ys                             // base: no x
-    : [ x, ...interleave (ys, xs) ]  // inductive: some x
+    : [x, ...interleave(ys, xs)]  // inductive: some x
 
-const genCtxMenuEntry = ({ _ws = {}, ctx=null, parentId=null, act=true, withSubmenu=false, id=null, title=null, type='normal'}) => {
+const genCtxMenuEntry = ({ _ws = {}, ctx = null, parentId = null, act = true, withSubmenu = false, id = null, title = null, type = 'normal' }) => {
 
   const _id = formatId(_ws?.name || id)
-  const _name = formatName(_ws?.name || title )
-  // console.log(`genCtxMenuEntry -> `,_name, withSubmenu)
+  const _name = formatName(_ws?.name || title)
+
   return {
     id: _id,
     title: _name,
-    ...(act && {act: (info, tab) => { console.log(`Menu component ${ _id }`) }}),
+    ...(act && { act: (info, tab) => { console.log(`Menu component ${ _id }`) } }),
     ...(withSubmenu && { menu: generateUniqueSubMenu(WORKSPACEMENU, _id) }),
-    ...(ctx && {contexts: ctx}),
+    ...(ctx && { contexts: ctx }),
     parentId: parentId,
     type: type,
     ...(type == 'checkbox' && { checked: true }),
     // ...(parentId && {parentId: parentId}),
-    ...(_ws && {_ws: _ws})
+    ...(_ws && { _ws: _ws })
   }
 }
 
 const create_workspace_handler = async (info, tab) => {
-  
+
   const wsName = window.prompt("Please Enter a Name for your new WorkSpace");
   // const win = await browser.windows.getLastFocused({ populate: true })  
   // const aNewWorkSpace = ws.fromWindows([win], wsName)
-  const win = await browser.windows.getAll({populate:true})
+  const win = await browser.windows.getAll({ populate: true })
   const aNewWorkSpace = ws.fromWindows(win, wsName)
 
   WS_MANAGER.add(aNewWorkSpace)
 
   // const _id = formatId(aNewWorkSpace.name)
   // const _name = formatName(aNewWorkSpace.name)
-  
-  let menuComponent = genCtxMenuEntry({_ws: aNewWorkSpace, ctx:null, parentId:null, withSubmenu:true})
+
+  let menuComponent = genCtxMenuEntry({ _ws: aNewWorkSpace, ctx: null, parentId: null, withSubmenu: true })
   dynamicRootMenuWorkSpace.push(menuComponent)
   console.log(dynamicRootMenuWorkSpace)
-  
+
   CTX_MENU.updateMenu()
 
   return aNewWorkSpace
@@ -57,14 +58,14 @@ const create_workspace_handler = async (info, tab) => {
 
 const delete_workspace_handler = (info, tab) => {
   console.log(`${ info.menuItemId } Clicked`)
-  
+
   const wsName = window.prompt("Enter the name of a WorkSpace to DELETE")
   // delete context menu element
   // delete listener
   const _id = formatId(wsName)
   WS_MANAGER.remove(_id)
   CTX_MENU.deleteMenu(_id)
-  dynamicRootMenuWorkSpace = dynamicRootMenuWorkSpace.filter( m => m.id != _id )
+  dynamicRootMenuWorkSpace = dynamicRootMenuWorkSpace.filter(m => m.id != _id)
   // delete saved string
 }
 
@@ -79,7 +80,7 @@ const WORKSPACEMENU = [
         return m.id != info.parentMenuItemId ? m :
           {
             ...m,
-            ...{menu: generateUniqueSubMenu(WORKSPACEMENU, info.parentMenuItemId)}
+            ...{ menu: generateUniqueSubMenu(WORKSPACEMENU, info.parentMenuItemId) }
           }
       })
       CTX_MENU.updateMenu()
@@ -88,7 +89,7 @@ const WORKSPACEMENU = [
   { id: 'remove_fn', title: 'Remove this tab', act: (info, tab) => { console.log('context Menu-> remove_fn', info, tab, info.menuItemId); alert('Clicked ItemG') } },
   {
     id: 'peek_fn', title: 'Peek',
-    act: (info, tab) => {console.log('context Menu-> peek_fn', info, tab, info.menuItemId)},
+    act: (info, tab) => { console.log('context Menu-> peek_fn', info, tab, info.menuItemId) },
     menu: []
   },
   {
@@ -102,8 +103,8 @@ const WORKSPACEMENU = [
 
 // menu element need to have Unique IDs
 const generateUniqueSubMenu = (m, parentName) => {
-  const arr1 = WS_MANAGER.get(parentName).windows.map(x => x.tabs.map(t => {return {title:t.title, url: t.url}}))
-  const arr2 = Array.from({ length: arr1.length - 1 }, () => '|') 
+  const arr1 = WS_MANAGER.get(parentName).windows.map(x => x.tabs.map(t => { return { title: t.title, url: t.url } }))
+  const arr2 = Array.from({ length: arr1.length - 1 }, () => '|')
   const arr3 = interleave(arr1, arr2).flat().map(x => {
     if (x == '|') {
       return [{
@@ -113,25 +114,25 @@ const generateUniqueSubMenu = (m, parentName) => {
       }]
     }
     return {
-      id: `${ Math.random(1) + 100 }`,
+      id: randomId(),
       name: x.title,
       title: x.title,
       act: (info, tab) => { console.log('Opening URL - ', x.url) }
     }
-    }).flat()
-  
-    console.log(`generateUniqueSubMenu -> `,parentName, m)
+  }).flat()
+
+  console.log(`generateUniqueSubMenu -> `, parentName, m)
 
   return m.map(item => {
     return {
       ...item,
       ...{ id: `${ item.id }_${ formatId(parentName) }` },
       ...(item.id == 'peek_fn' && {
-        menu:arr3
+        menu: arr3
         // menu: [{
         //   id: `${Math.random(1) + 100}`,
         //   title: `${Math.random(1) + 100}_${parentName}`,
-      
+
         // }]
       }),
     }
@@ -139,37 +140,39 @@ const generateUniqueSubMenu = (m, parentName) => {
 }
 
 const OPTIONMENU = [
-  { id: "focus_option", type: "checkbox", checked:false,  title: "Focus ( Temporarily close other tabs )", act: (info, tab) => {  console.log(info, tab)}},
-  { id: "discard_option", type: "checkbox", checked:false,  title: "Discard Tabs on Open", act: (info, tab) => {  console.log(info, tab)}}
+  { id: "focus_option", type: "checkbox", checked: false, title: "Focus ( Temporarily close other tabs )", act: (info, tab) => { console.log(info, tab) } },
+  { id: "discard_option", type: "checkbox", checked: false, title: "Discard Tabs on Open", act: (info, tab) => { console.log(info, tab) } }
 ]
 
 const ROOTMENU = [
   { id: 'create_workspace', title: 'Create WorkSpace', act: create_workspace_handler },
   { id: 'delete_workspace', title: 'Delete WorkSpace', act: delete_workspace_handler },
   { id: 'option', title: 'Options', menu: OPTIONMENU },
-  {type: 'separator'},
+  { type: 'separator' },
 ];
 
-const reloadSavedWS = () =>{
-  let  res = []
-  for (const [wsId,wsObj] of Object.entries(WS_MANAGER.all)){
+const reloadSavedWS = () => {
+  let res = []
+  for (const [wsId, wsObj] of Object.entries(WS_MANAGER.all)) {
     console.log(wsId, wsObj)
-    res.push(genCtxMenuEntry({_ws: wsObj, ctx: null, parentId:null, withSubmenu:true}))
+    res.push(genCtxMenuEntry({ _ws: wsObj, ctx: null, parentId: null, withSubmenu: true }))
   }
 
   if (res.length == 0) {
-    res.push(genCtxMenuEntry({_ws: ws.fromWindows([{ tabs: [] }], 'news', WS_MANAGER), ctx: null, parentId:null, withSubmenu:true}),
-    genCtxMenuEntry({_ws: ws.fromWindows([{ tabs: [] }], 'school', WS_MANAGER), ctx: null, parentId:null, withSubmenu:true}),
-    genCtxMenuEntry({_ws: ws.fromWindows([{ tabs: [] }], 'games', WS_MANAGER), ctx: null, parentId:null, withSubmenu:true}))
+    res.push(
+      genCtxMenuEntry({ _ws: ws.fromWindows([{ tabs: [] }], 'news', WS_MANAGER), ctx: null, parentId: null, withSubmenu: true }),
+      genCtxMenuEntry({ _ws: ws.fromWindows([{ tabs: [] }], 'school', WS_MANAGER), ctx: null, parentId: null, withSubmenu: true }),
+      genCtxMenuEntry({ _ws: ws.fromWindows([{ tabs: [] }], 'games', WS_MANAGER), ctx: null, parentId: null, withSubmenu: true })
+    )
   }
 
-  return res.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0))
+  return res.sort((a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0))
 }
 
 let dynamicRootMenuWorkSpace = [
   ...reloadSavedWS(),
 ].sort(
-  (a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0)
+  (a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0)
 )
 window.dynamicRootMenuWorkSpace = dynamicRootMenuWorkSpace
 
@@ -177,14 +180,14 @@ export class ctxMenu {
 
   static listeners = {}
   static contexts = CONTEXTS
-  
+
   static workSpaces = [];
   static rootMenu = [];
 
   constructor(entries = [], _rootMenu = []) {
     this._reset()
 
-    ctxMenu.rootMenu =  _rootMenu.length ? _rootMenu : ROOTMENU 
+    ctxMenu.rootMenu = _rootMenu.length ? _rootMenu : ROOTMENU
     this.workSpaces = []
     // append existing ws to the rootMenu
     for (const w of entries) {
@@ -211,7 +214,7 @@ export class ctxMenu {
 
   createMenu(menu, root = null) {
     console.log("createMenu ->", menu, root)
-    
+
     for (let _m of menu) {
       let { id, title, menu, act, type, _ws } = _m
 
@@ -221,22 +224,22 @@ export class ctxMenu {
       }
 
       chrome.contextMenus.create(
-        
+
         (type == "separator") ? {
           type: "separator",
           parentId: root,
-        }: 
-        genCtxMenuEntry({
-          id: id,
-          ...(title && {title: `${formatName(title)} ${_ws?`(${_ws.tabCount})`:''}`.trim()}),
-          ctx: ctxMenu.contexts,
-          parentId: root,
-          act: false,
-          _ws: false,
-          type: type || 'normal'
-        })
+        } :
+          genCtxMenuEntry({
+            id: id,
+            ...(title && { title: `${ formatName(title) } ${ _ws ? `(${ _ws.tabCount })` : '' }`.trim() }),
+            ctx: ctxMenu.contexts,
+            parentId: root,
+            act: false,
+            _ws: false,
+            type: type || 'normal'
+          })
       );
-        
+
       if (act) { ctxMenu.listeners[id] = act }
       if (menu) { this.createMenu(menu, id) }
     }
@@ -244,13 +247,13 @@ export class ctxMenu {
 
   updateMenu(menu = [], root = null) {
 
-    const _menu = [...ROOTMENU, ...dynamicRootMenuWorkSpace.sort( (a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0)) ]  // add all available menu
-    
+    const _menu = [...ROOTMENU, ...dynamicRootMenuWorkSpace.sort((a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0))]  // add all available menu
+
     console.log("UpdateMenu->", _menu.map(m => m.title))
     // console.log(_menu.map(m => m.title))
     this.createMenu(_menu)
   }
-  
+
   deleteMenu(id) {
     if (id in ctxMenu.listeners) {
       // console.log(`Deleting ${id} - listener`)
