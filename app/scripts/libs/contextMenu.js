@@ -34,13 +34,26 @@ const genCtxMenuEntry = ({ _ws = {}, ctx = null, parentId = null, act = true, wi
   }
 }
 
-const create_workspace_handler = async (info, tab) => {
+const create_empty_workspace_handler = () => {
+  const wsName = window.prompt("Please Enter a Name for your new WorkSpace")
+  let menuComponent = genCtxMenuEntry({ _ws: ws.fromWindows([{ tabs: [] }], wsName, WS_MANAGER), ctx: null, parentId: null, withSubmenu: true })
+  dynamicRootMenuWorkSpace.push(menuComponent)
+  CTX_MENU.updateMenu()
+  return aNewWorkSpace
+
+}
+
+const create_workspace_handler = async (info, tab, current=false) => {
 
   const wsName = window.prompt("Please Enter a Name for your new WorkSpace");
-  // const win = await browser.windows.getLastFocused({ populate: true })  
-  // const aNewWorkSpace = ws.fromWindows([win], wsName)
-  const win = await browser.windows.getAll({ populate: true })
-  const aNewWorkSpace = ws.fromWindows(win, wsName)
+
+  if (current) {
+    const win = await browser.windows.getLastFocused({ populate: true })  
+    const aNewWorkSpace = ws.fromWindows([win], wsName)
+  } else {
+    const win = await browser.windows.getAll({ populate: true })
+    const aNewWorkSpace = ws.fromWindows(win, wsName)
+  }
 
   WS_MANAGER.add(aNewWorkSpace)
 
@@ -144,8 +157,14 @@ const OPTIONMENU = [
   { id: "discard_option", type: "checkbox", checked: false, title: "Discard Tabs on Open", act: (info, tab) => { console.log(info, tab) } }
 ]
 
+const CREATEWSMENU = [
+  { id: 'create_workspace_empty', title: 'Empty Workspace', act: create_empty_workspace_handler },
+  { id: 'create_workspace_from_all', title: 'From all open Windows', act: (info, tab,)=> create_workspace_handler(info, tab, true) },
+  { id: 'create_workspace_from_current', title: 'From Current Window', act: create_workspace_handler },
+]
+
 const ROOTMENU = [
-  { id: 'create_workspace', title: 'Create WorkSpace', act: create_workspace_handler },
+  { id: 'create_workspace', title: 'Create WorkSpace', menu: CREATEWSMENU },
   { id: 'delete_workspace', title: 'Delete WorkSpace', act: delete_workspace_handler },
   { id: 'option', title: 'Options', menu: OPTIONMENU },
   { type: 'separator' },
@@ -154,7 +173,7 @@ const ROOTMENU = [
 const reloadSavedWS = () => {
   let res = []
   for (const [wsId, wsObj] of Object.entries(WS_MANAGER.all)) {
-    console.log(wsId, wsObj)
+    // console.log(wsId, wsObj)
     res.push(genCtxMenuEntry({ _ws: wsObj, ctx: null, parentId: null, withSubmenu: true }))
   }
 
@@ -224,14 +243,14 @@ export class ctxMenu {
       }
 
       chrome.contextMenus.create(
-
+        // ⦾
         (type == "separator") ? {
           type: "separator",
           parentId: root,
         } :
           genCtxMenuEntry({
             id: id,
-            ...(title && { title: `${ formatName(title) } ${ _ws ? `(${ _ws.tabCount })` : '' }`.trim() }),
+            ...(title && { title: `${ _ws ? `⦿` : '' } ${ formatName(title).replace('⦿','') } ${ _ws ? `(${ _ws.tabCount })` : '' }`.trim() }),
             ctx: ctxMenu.contexts,
             parentId: root,
             act: false,
@@ -246,6 +265,9 @@ export class ctxMenu {
   }
 
   updateMenu(menu = [], root = null) {
+
+    // const drmw = dynamicRootMenuWorkSpace.map(ws => { return { ...ws, title: `⦿ ${ ws.title }` } })
+    // console.log(drmw.map(t => t.title))
 
     const _menu = [...ROOTMENU, ...dynamicRootMenuWorkSpace.sort((a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0))]  // add all available menu
 
