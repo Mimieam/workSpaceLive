@@ -22,7 +22,6 @@ export class ws {
     if (!skip) {
       _windows.forEach(w => {
         const { meta, urls, tabs } = w
-        console.log(w)
         if (tabs != []) {
           return ws.fromTabObj(this.name, tabs)
         }
@@ -254,10 +253,10 @@ export class wsManager {
 
     if (_all_ws_str ){
       const saved = JSON.parse(_all_ws_str)
-      console.log(saved)
+      // console.log(saved)
 
       for (const [wsId, wsObj] of Object.entries(saved)) {
-        console.log(wsId, wsObj)
+        // console.log(wsId, wsObj)
         this.reHydrate(wsObj)
       }
       console.log("reLoading wsManager =>", this.all)

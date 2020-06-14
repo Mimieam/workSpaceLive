@@ -103,3 +103,8 @@ const currentDate = () => {
     return date
 }
 
+
+export const interleave = ([x, ...xs], ys = []) =>
+  x === undefined
+    ? ys                             // base: no x
+    : [x, ...interleave(ys, xs)]  // inductive: some x

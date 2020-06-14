@@ -6,14 +6,11 @@
 
 import WS_MANAGER, { ws, formatId, formatName } from './neoWorkSpace'
 import browser from 'webextension-polyfill';
-import { randomId } from './helpers'
+import { randomId, interleave } from './helpers'
+import './startUp'
 
 window.WS_MANAGER = WS_MANAGER
 
-const interleave = ([x, ...xs], ys = []) =>
-  x === undefined
-    ? ys                             // base: no x
-    : [x, ...interleave(ys, xs)]  // inductive: some x
 
 const genCtxMenuEntry = ({ _ws = {}, ctx = null, parentId = null, act = true, withSubmenu = false, id = null, title = null, type = 'normal' }) => {
 
@@ -35,6 +32,7 @@ const genCtxMenuEntry = ({ _ws = {}, ctx = null, parentId = null, act = true, wi
 }
 
 const create_empty_workspace_handler = () => {
+  let aNewWorkSpace = {}
   const wsName = window.prompt("Please Enter a Name for your new WorkSpace")
   let menuComponent = genCtxMenuEntry({ _ws: ws.fromWindows([{ tabs: [] }], wsName, WS_MANAGER), ctx: null, parentId: null, withSubmenu: true })
   dynamicRootMenuWorkSpace.push(menuComponent)
@@ -43,16 +41,18 @@ const create_empty_workspace_handler = () => {
 
 }
 
-const create_workspace_handler = async (info, tab, current=false) => {
+const create_workspace_handler = async (info, tab, current=true) => {
 
   const wsName = window.prompt("Please Enter a Name for your new WorkSpace");
-
+  let aNewWorkSpace = {}
   if (current) {
     const win = await browser.windows.getLastFocused({ populate: true })  
-    const aNewWorkSpace = ws.fromWindows([win], wsName)
+    aNewWorkSpace = ws.fromWindows([win], wsName)
+    console.log("creating WS from current window")
   } else {
     const win = await browser.windows.getAll({ populate: true })
-    const aNewWorkSpace = ws.fromWindows(win, wsName)
+    aNewWorkSpace = ws.fromWindows(win, wsName)
+    console.log("creating WS from ALL windows")
   }
 
   WS_MANAGER.add(aNewWorkSpace)
@@ -62,23 +62,23 @@ const create_workspace_handler = async (info, tab, current=false) => {
 
   let menuComponent = genCtxMenuEntry({ _ws: aNewWorkSpace, ctx: null, parentId: null, withSubmenu: true })
   dynamicRootMenuWorkSpace.push(menuComponent)
-  console.log(dynamicRootMenuWorkSpace)
-
   CTX_MENU.updateMenu()
 
   return aNewWorkSpace
 }
 
-const delete_workspace_handler = (info, tab) => {
-  console.log(`${ info.menuItemId } Clicked`)
+// const delete_workspace_handler = (info, tab) => {
+const delete_workspace_handler = async (_id) => {
+  console.log(`${ _id } Clicked`)
 
-  const wsName = window.prompt("Enter the name of a WorkSpace to DELETE")
+  const yesOrNo = window.prompt(`Are you Sure you want to DELETE "${_id}"? \nYes/No`).trim()
   // delete context menu element
   // delete listener
-  const _id = formatId(wsName)
-  WS_MANAGER.remove(_id)
-  CTX_MENU.deleteMenu(_id)
+  await WS_MANAGER.remove(_id)
+  await CTX_MENU.deleteMenu(_id)
   dynamicRootMenuWorkSpace = dynamicRootMenuWorkSpace.filter(m => m.id != _id)
+  // DELETEMENU = DELETEMENU.filter( m => m.id != _id)
+  CTX_MENU.updateMenu()
   // delete saved string
 }
 
@@ -87,7 +87,7 @@ const CONTEXTS = ["page", "frame", "selection", "link", "editable", "image", "vi
 const WORKSPACEMENU = [
   {
     id: 'add_fn', title: 'Add this tab', act: (info, tab) => {
-      WS_MANAGER.all[info.parentMenuItemId].add(info.pageUrl)
+      WS_MANAGER.all[info.parentMenuItemId].add(tab.url, tab.title)
 
       dynamicRootMenuWorkSpace = dynamicRootMenuWorkSpace.map(m => {
         return m.id != info.parentMenuItemId ? m :
@@ -114,6 +114,22 @@ const WORKSPACEMENU = [
   },
 ];
 
+const generateWSDeleteList = () => {
+  let res = Object.keys(WS_MANAGER.all).map(wsName => {
+    return {
+      id: randomId(),
+      name: wsName,
+      title: wsName,
+      act: (info, tab) => {
+        delete_workspace_handler(wsName)
+        console.log('Deleting WS - ', wsName)
+      }
+    }
+  }).sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0))
+  // CTX_MENU?.updateMenu() 
+  return res
+} 
+
 // menu element need to have Unique IDs
 const generateUniqueSubMenu = (m, parentName) => {
   const arr1 = WS_MANAGER.get(parentName).windows.map(x => x.tabs.map(t => { return { title: t.title, url: t.url } }))
@@ -134,7 +150,7 @@ const generateUniqueSubMenu = (m, parentName) => {
     }
   }).flat()
 
-  console.log(`generateUniqueSubMenu -> `, parentName, m)
+  // console.log(`generateUniqueSubMenu -> `, parentName, m)
 
   return m.map(item => {
     return {
@@ -159,13 +175,18 @@ const OPTIONMENU = [
 
 const CREATEWSMENU = [
   { id: 'create_workspace_empty', title: 'Empty Workspace', act: create_empty_workspace_handler },
-  { id: 'create_workspace_from_all', title: 'From all open Windows', act: (info, tab,)=> create_workspace_handler(info, tab, true) },
+  { id: 'create_workspace_from_all', title: 'From All Windows', act: (info, tab,)=> create_workspace_handler(info, tab, false) },
   { id: 'create_workspace_from_current', title: 'From Current Window', act: create_workspace_handler },
+]
+
+let DELETEMENU = [
+  ...generateWSDeleteList(),
 ]
 
 const ROOTMENU = [
   { id: 'create_workspace', title: 'Create WorkSpace', menu: CREATEWSMENU },
-  { id: 'delete_workspace', title: 'Delete WorkSpace', act: delete_workspace_handler },
+  { id: 'delete_workspace', title: 'Delete WorkSpace', menu: DELETEMENU},
+  // { id: 'delete_workspace', title: 'Delete WorkSpace', act: delete_workspace_handler },
   { id: 'option', title: 'Options', menu: OPTIONMENU },
   { type: 'separator' },
 ];
@@ -173,7 +194,6 @@ const ROOTMENU = [
 const reloadSavedWS = () => {
   let res = []
   for (const [wsId, wsObj] of Object.entries(WS_MANAGER.all)) {
-    // console.log(wsId, wsObj)
     res.push(genCtxMenuEntry({ _ws: wsObj, ctx: null, parentId: null, withSubmenu: true }))
   }
 
@@ -232,7 +252,7 @@ export class ctxMenu {
   }
 
   createMenu(menu, root = null) {
-    console.log("createMenu ->", menu, root)
+    // console.log("createMenu ->", menu, root)
 
     for (let _m of menu) {
       let { id, title, menu, act, type, _ws } = _m
@@ -265,13 +285,16 @@ export class ctxMenu {
   }
 
   updateMenu(menu = [], root = null) {
+    this._reset() // remove all so there is no ID issues
 
     // const drmw = dynamicRootMenuWorkSpace.map(ws => { return { ...ws, title: `⦿ ${ ws.title }` } })
     // console.log(drmw.map(t => t.title))
-
-    const _menu = [...ROOTMENU, ...dynamicRootMenuWorkSpace.sort((a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0))]  // add all available menu
-
-    console.log("UpdateMenu->", _menu.map(m => m.title))
+    const _menu = [...ROOTMENU,...dynamicRootMenuWorkSpace.sort((a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0))]  // add all available menu
+    const nDm = [...generateWSDeleteList()] 
+    // console.log("NDM=====>", nDm)
+    _menu.find(x=>x.id=="delete_workspace").menu = [...generateWSDeleteList()] 
+    // console.log("DELETEMENU", ROOTMENU)
+    // console.log("UpdateMenu->", _menu.map(m => m.title))
     // console.log(_menu.map(m => m.title))
     this.createMenu(_menu)
   }
@@ -295,3 +318,4 @@ const listOfWorkSpaces = dynamicRootMenuWorkSpace
 console.log(listOfWorkSpaces.map(i => i.title))
 
 const CTX_MENU = new ctxMenu(listOfWorkSpaces, ROOTMENU)
+// CTX_MENU.updateMenu()
