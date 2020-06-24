@@ -10,7 +10,7 @@ import { openTab, currentDate } from './helpers'
  * ws.fromWindows(name)
  * */
 
-
+window.LZString = LZString
 export class ws {
   static totalWSCount = 0
 
@@ -123,13 +123,9 @@ export class ws {
     let wsStr = JSON.stringify({ name: this.name, windows: this.windows })
 
     if (compress) {
-      console.log("Size of sample is: " + wsStr.length);
-      var compressed = LZString.compressToUTF16(wsStr);
-      console.log("Size of compressed sample is: " + compressed.length);
-      var compressed = LZString.compress(wsStr);
-      console.log("Size of compressed sample is: " + compressed.length);
-      var compressed = LZString.compressToUint8Array(wsStr);
-      console.log("Size of compressed sample is: " + compressed.length);
+      console.log("Size of the data is: " + wsStr.length);
+      let compressed = LZString.compress(wsStr);
+      console.log("Size of compressed data is: " + compressed.length);
       wsStr = compressed
     }
 
@@ -155,6 +151,21 @@ export class ws {
 
     this.refreshCounts()
     console.log(`Added URL : ${ url } to ${ this.name }`)
+    this.wsManager.save()
+  }
+
+  update(urls) {
+    _update = urls.map((url) => {
+      return {
+        id: null,
+        url: url,
+        title: null,
+        pinned: null,
+        lastActive: null,
+      }
+    })
+    this.windows.push(_update)
+    this.refreshCounts()
     this.wsManager.save()
   }
 
@@ -207,6 +218,10 @@ export class wsManager {
     if (!this.noSave) {
       this.save()
     }
+  }
+
+  update(_id, tabs) {
+    
   }
 
   remove(nameOrId) {

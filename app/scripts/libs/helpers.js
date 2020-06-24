@@ -97,7 +97,7 @@ const saveToFile = (filename, dataString) => {
     saveAs(blob, filename);
 };
 
-const currentDate = () => {
+export const currentDate = () => {
     let date = new Date()
     date = date.toLocaleDateString(undefined, {day:'2-digit'}) + '-' + date.toLocaleDateString(undefined, {month:'short'}) + '-' + date.toLocaleDateString(undefined, {year:'numeric'})
     return date

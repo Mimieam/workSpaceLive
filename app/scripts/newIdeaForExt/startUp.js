@@ -1,36 +1,43 @@
 import browser from 'webextension-polyfill';
+import { generateRandomColor, ChromeRPC } from './utils';
 
 let DEBUG = true
-let newColor
+let newColor = ""
+
+let CURRENT_WINDOW_ID = ""
+
+const SET__CURRENT_WINDOW_ID = (id) => {
+  CURRENT_WINDOW_ID = id
+}
 
 const browserEventListener = async (skip = false) => {
+  ChromeRPC.sendMessage({current_window_id: CURRENT_WINDOW_ID})
   // console.error("[<->]=>browserEventListener: ")
   const win = await browser.windows.getLastFocused({populate:true});
   // const win_1 = await browser.windows.getCurrent({populate:true})
   // const allWindows = await GChromeWindow.getAll(false);
-  console.log(win.tabs)
 
   // In Dev Mode  - set the generateRandomColor(true)
-  // newColor = generateRandomColor(true);
-  newColor = '#ff813f';
+  newColor = generateRandomColor(true);
+  // newColor = '#ff813f';
   let numOftabs = win.tabs.length;
   let displayText = `${ numOftabs }|${ win.id }`
-  console.log("displayText =", displayText ,  numOftabs)
+  // console.log("displayText =", displayText ,  numOftabs)
   chrome.browserAction.setBadgeText({ text: `${displayText}` })
   // chrome.browserAction.setBadgeText({ text: `${win.id}` });
-  // chrome.browserAction.setBadgeBackgroundColor({ color: newColor });
+  chrome.browserAction.setBadgeBackgroundColor({ color: newColor });
 };
 
 chrome.tabs.onActivated.addListener(async (tab) => {
   // LAST_ACTIVE_WINDOW = tab.windowId
   await browserEventListener();
-  console.log('onActivated -- tab', tab);
+  // console.log('onActivated -- tab', tab);
 })
 
 let windowFocusHandler;
 chrome.windows.onFocusChanged.addListener(windowFocusHandler = async (win) => {
   await browserEventListener();
-  DEBUG && console.log('onFocusChanged -- Win', win);
+  // DEBUG && console.log('onFocusChanged -- Win', win);
 });
 
 chrome.runtime.onInstalled.addListener(async(details) => {

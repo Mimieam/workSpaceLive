@@ -3,7 +3,7 @@ import React from "react"
 import ReactDOM from "react-dom"
 // import styles from './../styles/main.css'
 import App from "./components/App"
-import browser from 'webextension-polyfill';
+// import browser from 'webextension-polyfill';
 
 import { RecoilRoot } from 'recoil';
 

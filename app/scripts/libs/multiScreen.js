@@ -1,15 +1,5 @@
 import { promisify } from './utils'
 
-// const promisify = (fn) => (...args) => new Promise((resolve, reject) => {
-//   fn(...args, (value, error) => {
-//     if (error) {
-//       reject(error);
-//     } else {
-//       resolve(value);
-//     }
-//   });
-// });
-
 export class Viewport {
   constructor({ top, left, width, height }) {
     const w = width

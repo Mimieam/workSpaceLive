@@ -1,7 +1,7 @@
 import browser from 'webextension-polyfill';
 
-import { DEFAULT_OPTIONS } from './libs/datamodel';
-import { promisify } from './libs/utils';
+// import { DEFAULT_OPTIONS } from './libs/datamodel';
+// import { promisify } from './libs/utils';
 import { getOverlappingMonitor } from './libs/multiScreen';
 import './libs/contextMenu'
 
@@ -97,7 +97,7 @@ const openUrls = async (_urls, windowId) => {
 }
 
 browser.commands.onCommand.addListener(async (command) => {
-    const w = await browser.windows.getCurrent({populate:true});
+    const w = await browser.windows.getCurrent({ populate: true });
     
     switch (command) {
         case 'copy_all_url': 
@@ -118,7 +118,14 @@ browser.commands.onCommand.addListener(async (command) => {
     }
 });
 
-browser.webRequest.onBeforeRequest.addListener((req) => {
+
+/**
+ *  requires  permissions: - disabling this for now
+*   "<all_urls>",
+ *  "webRequest",
+    "webRequestBlocking",
+ * */ 
+browser.webRequest?.onBeforeRequest.addListener((req) => {
     OPENED_POPUP.some(x => {
         console.log(x.popupTabId,  req.tabId, x.popupTabId == req.tabId)
         return x.popupTabId == req.tabId
@@ -137,7 +144,7 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
 
 const TS2 = {
     browser,
-    DEFAULT_OPTIONS,
+    // DEFAULT_OPTIONS,
     console // Xpose the console here to share it with the popup
 };
 

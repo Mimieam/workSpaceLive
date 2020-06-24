@@ -4,7 +4,8 @@ import browser from 'webextension-polyfill';
 import { getItems, reorder, getItemStyle,getListStyle ,move } from './helpers'
 import Tab, { Tab_} from './Tab'
 import useGlobal from './store';
-import styled from '@emotion/styled';
+// import styled from '@emotion/styled';
+// import Sidebar from './Sidebar'
 
 import '../../styles/main.css'
 
@@ -91,6 +92,7 @@ export default function App() {
   console.log(state)
   return (
     <div>
+      {/* <Sidebar/> */}
       <p>
         WorkSpaceLive - counter:
         { globalState.counter }
