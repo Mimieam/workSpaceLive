@@ -1,0 +1,67 @@
+E001759962
+
+Alberta
+British Columbia
+Ontario
+
+quick mining fct
+'
+Array.from(document.querySelectorAll('strong')).map(s => s.innerHTML)
+
+"Diamond Offshore Drilling", "Frontier Communications", "Gold’s Gym", "Intelsat", "J.Crew", "John Varvatos Enterprises", "Neiman Marcus", "Stage Stores", "True Religion Apparel", "Ultra Petroleum", "Virgin Australia&nbsp;", "&nbsp;", "Whiting Petroleum", "Chesapeake Energy", "Hertz", "JC Penney", "Lord &amp; Taylor", "Mohegan Gaming &amp; Entertainment", "Sur La Table"
+
+"Advantage Rent a Car", "Akorn", "Aldo Group", "Art Van Furniture", "Avianca", "Avianca Holdings", "Bakers Square", "Bar Louie Restaurants", "Boomers! Parks", "Boy Scouts of America", "Così (restaurant)", "Dean &amp; DeLuca", "Diamond Offshore Drilling", "Earth Fare", "Exide", "Fairway Market", "FoodFirst Global Restaurants", "Frontier Communications", "Gold's Gym", "Goodrich Quality Theaters", "The Hertz Corporation", "HopCat", "Hornbeck Offshore Services", "Hytera", "Intelsat", "J. C. Penney", "J.Crew", "John Varvatos (company)", "Krystal (restaurant)", "LATAM Airlines Group", "Libbey Incorporated", "LSC Communications", "Lucky's Market", "McClatchy", "McDermott International", "Modell's Sporting Goods", "Neiman Marcus", "OneWeb", "Le Pain Quotidien", "Pier 1 (retail chain)", "Reitmans", "Roman Catholic Diocese of Harrisburg", "Stage Stores", "Tuesday Morning", "USA Rugby", "Village Inn", "Whiting Petroleum Corporation", "XFL (2020)"
+
+
+"1. J. Crew", "2. Neiman Marcus", "3. Stage Stores", "4. J.C. Penney", "5. Tuesday Morning"
+
+
+https://www.discoverci.com/stock-scanner/nasdaq-stocks-under-1
+https://www.benzinga.com/money/best-penny-stocks/
+
+
+Intelsat SA
+Helius Medical Technologies Inc - NASDAQ: HSDT
+Surge Energy Inc - OTCMKTS: ZPTAF
+Enquest Plc - OTCMKTS: ENQUF
+Empire Post Media Inc - OTCMKTS: EMPM
+Frontier Communications Corp - OTCMKTS: FTRCQ
+
+
+
+eyJhbGciOiJQUzI1NiIsInR5cCI6IkpXVCJ9.eyJjYWxsYmFjayI6IiIsImVtYWlsIjoiLitALisiLCJmb3JtYXQiOiJqc29uIiwib3JnIjoiLioiLCJwdWIiOiJuZW80ai5jb20iLCJyZWciOiIgIiwic3ViIjoibmVvNGotZGVza3RvcCIsImV4cCI6MTYyMzMyODQyNSwidmVyIjoiKiIsImlzcyI6Im5lbzRqLmNvbSIsIm5iZiI6MTU5MTc5MjQyNSwiaWF0IjoxNTkxNzkyNDI1LCJqdGkiOiJ4M3Z2WVhsUHIifQ.a7I5wL88wPYbpPKscqp-rOEtv1a4D-_XttSKf_rRJxozTi6B4eq1fxbg6TrFHcMElqyURGMO6sz3pHP6Z4TI4xi_C7cHM2AhDxbCGthXkwIBZtgY99JZqoxDyv7NtOrXMzTTFJS4B5e3pk1LOfGKQvK9NSLTjqlIliQtWG5gJPAksAsMOIK0LQzpBfRTJBpKOiOu7SD5Fiwq-AGAC1v4vmQCEeoqVZMfj_Ci1KEhU3P_nZ_TE1SjDNBkYdYq5aiTZFF4_vm2rHCYN8zhUGbdhrjuNHxe5ZJHbinUPdz5-SeqCkpj1IrUOVLajbfXpUFrNf7qTUO3mm-4fm932SsAPw
+
+
+
+
+ETF:
+- DRIP - https://etfdb.com/etf/DRIP/#expense
+- GERM - 
+
+
+Consider the function definition that takes a sorted list of integers with no duplicates and a target integer (eg list=[1,4,6,7,8,10,18], target=24). Complete the function so that True is returned if any two of the integers add up to the target, otherwise return False. The function should have a complexity of O(n).
+ 
+def has_sum(list, target):
+	for x in list:
+		for y in list[1:]:
+			if x + y == target:
+return True 
+
+	return False
+
+def has_sum(list, target):
+	i = 0
+	j = list.length - 1
+	for x in list:
+	   if  list[i] + list[j] == target
+		return True
+	  else:
+		if list[i] + list[j] > target:
+		   j -= 1
+		else:
+		    i+=1
+
+	
+  
+ 
+	  

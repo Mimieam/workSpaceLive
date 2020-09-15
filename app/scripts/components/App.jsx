@@ -8,38 +8,21 @@ import useGlobal from './store';
 // import Sidebar from './Sidebar'
 
 import '../../styles/main.css'
-
-
-const windowToWS = (windowsArr, name='ws') => {
-  const windows =  windowsArr.map( w => { 
-    const {height, width, top, left, id, tabs} = w
-    return {
-      id,
-      bounds: {height, width, top, left},
-      tabs: tabs.map(t=>{
-          const {url, title, id, pinned} = t
-          return {url, title, id, pinned}
-      })
-    }
-  })
-
-  const winCount = windows.length
-  const tabCount = windowsArr.reduce((acc, w) => { return acc + w.tabs.length }, 0)
-
-  return { name, windows, tabCount, winCount }  
-}
-
+import { ChromeRPC } from "../libs/utils";
+import { useChromeMessagePassing } from '../libs/onMessageHook'
 
 export default function App() {
-  const [state, setState] = useState([getItems(10), getItems(5, 10)]);
+  const [state, setState] = useState([]);
   const [globalState, globalActions] = useGlobal();
+  
+  useChromeMessagePassing(setState)
 
   useEffect(() => {
     const fetchCurrentWindows = async () => {
       const windows = await browser.windows.getAll({ populate: true })
       const tabs = windows.map(w => w.tabs)
-      console.log(windows)
-      console.log(`tabs = ${ tabs }`, state, tabs)
+      // console.log(windows)
+      // console.log(`tabs = ${ tabs }`, state, tabs)
       setState([...tabs, []])
     }
 
@@ -47,11 +30,27 @@ export default function App() {
     return () => { }
   }, []);
 
+  const format = (state, sInd, dInd, source, destination) => {
+    console.log("HEY!")
+
+    const sourceTabId = state[sInd][source.index]?.id
+    const sourceTabIndex = source.index
+    const destinationWindowId = state[dInd]? state[dInd][0]?.windowId: ''
+    const destinationTabIndex = destination?.index
+
+    ChromeRPC.sendMessage({ MOVE_TAB: `${ sourceTabId }, ${ sourceTabIndex }, ${ destinationWindowId }, ${ destinationTabIndex }` },
+      (data) => {
+        console.log(data)
+      }
+    )
+    console.log(sourceTabId, sourceTabIndex, destinationWindowId, destinationTabIndex)
+  }
+
 
   function onDragEnd(result) {
 
     const { source, destination } = result;
-
+    console.log(source, destination)
     // dropped outside the list
     if (!destination) {
       let sInd = +source.droppableId;
@@ -67,6 +66,7 @@ export default function App() {
 
       console.log(newState, [state[sInd][source.index]], dInd, result[dInd])
       setState(newState.filter(group => group.length));
+      format(state, sInd, dInd, source, destination)
       return;
     }
     const sInd = +source.droppableId;
@@ -76,7 +76,7 @@ export default function App() {
       const items = reorder(state[sInd], source.index, destination.index);
       const newState = [...state];
       newState[sInd] = items;
-      console.log(sInd, state[sInd], source.index, source)
+      console.log('reOrder', sInd, state[sInd], source.index, source)
 
       setState(newState);
     } else {
@@ -87,9 +87,10 @@ export default function App() {
 
       setState(newState.filter(group => group.length));
     }
+    format(state, sInd, dInd, source, destination)
   }
-
-  console.log(state)
+  
+  console.log("App state: ", state)
   return (
     <div>
       {/* <Sidebar/> */}
@@ -101,10 +102,10 @@ export default function App() {
       <div style={ { display: "flex", flexDirection: 'column' } }>
         <DragDropContext onDragEnd={ onDragEnd }>
           { state.map((el, ind) => (
-            <Droppable key={ ind } droppableId={ `${ ind }` }>
+            <Droppable key={ ind } droppableId={ `${ind}` }>
               { (provided, snapshot) => (
               <Fragment>
-                  <div className={ "windowTitle" }>WindowTitle</div>  
+                  <div className={ "windowTitle" }> WindowTitle { `${el[0]?.windowId}`} </div>  
                 <div
                 className={ "wrapper" + `${snapshot.isDraggingOver? ' isDragging':'' }` }
                 ref={ provided.innerRef }

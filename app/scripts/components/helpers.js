@@ -60,7 +60,7 @@ export  const move = (source, destination, droppableSource, droppableDestination
   const result = {};
   result[droppableSource.droppableId] = sourceClone;
   result[droppableDestination.droppableId] = destClone;
-  console.log( result )
+  console.log(" move - res: ",result )
   return result;
 };
 

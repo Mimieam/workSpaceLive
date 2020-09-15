@@ -3,8 +3,10 @@ import browser from 'webextension-polyfill';
 // import { DEFAULT_OPTIONS } from './libs/datamodel';
 // import { promisify } from './libs/utils';
 import { getOverlappingMonitor } from './libs/multiScreen';
-import './libs/contextMenu'
 
+import { handleMessagePassing } from './libs/onMessageHook'
+import './libs/contextMenu'
+import './libs/bgEvents'
 
 let DEBUG = true
 let OPENED_POPUP = []
@@ -67,6 +69,8 @@ chrome.browserAction.onClicked.addListener(async() => {
     // chrome.developerPrivate.openDevTools({ extensionId: "nnlfihnjlcnpiddiilpmobjncpbhagnm" }, () => { console.log('DevTool Opened')})
 
 });
+
+handleMessagePassing()
 
 /*
  * Chrome.browserAction.setBadgeText({ text: `${displayText}` })

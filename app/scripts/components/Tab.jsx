@@ -38,7 +38,7 @@ export const Tab_ = ({ item, state, setState, index, ind }) => {
     <div style={ _style_wrapper }>
       <FavIcon url={ item.url } />
       <div style={ _style_title }>
-        { item.title }
+        { `${item.id}|${item.index}`} { item.title }
       </div>
       {/* <button
         type="button"
