@@ -1,0 +1,29 @@
+.square_btn{
+  padding: 0.1em;
+  min-width: 2.2em;
+  text-align: center;
+  /* transition:  300ms; */
+}
+.square_btn:hover {
+  display: inline-block;
+  padding: 0.1em;
+  min-width: 2.2em;
+  /* margin-left: 0.2em; */
+  text-decoration: none;
+  color: var(--main-color);
+  border: solid 2px var(--main-color);
+  border-radius: 3px;
+
+}
+
+.square_btn:active {
+  background: var(--main-color);
+  color: var(--accent-color);
+  transform: translateY(3px);
+}
+
+.tab:hover {
+  border-bottom: 3px solid var(--main-color);
+  border-bottom-right-radius: 1px;
+  border-bottom-left-radius: 1px;
+}
