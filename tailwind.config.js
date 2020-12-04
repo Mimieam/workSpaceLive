@@ -4,4 +4,13 @@ module.exports = {
   },
   variants: {},
   plugins: [],
+  purge: {
+    mode: 'all',
+    preserveHtmlElements: false,
+    content:[
+    './app/**/*.html',
+    './app/**/*.jsx',
+    './app/**/*.js',
+    ]
+  },
 }

@@ -2,62 +2,43 @@ import React, { useState, useEffect, Component } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import browser from 'webextension-polyfill';
 import { getItems, reorder, getItemStyle,getListStyle ,move } from './helpers'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faClone, faThumbtack, faWindowClose } from '@fortawesome/free-solid-svg-icons'
 
 
 import useGlobal from './store';
 import './tab.css'
+import { ButtonStrip } from "./ButtonStrip";
 
 export const FavIcon = ({ url }) => {
   const _style = {
-    background: `url(chrome://favicon/size/16@x2/${ url }) no-repeat center`,
+    // background: `url(${ url }) no-repeat center`,
+    // add this if u gonna use the chrome cache.. but it will give u low quality  "content_security_policy": "img-src chrome://favicon;"
+    // background: `url(chrome://favicon/size/16@x2/${ url }) no-repeat center`,
     height: "16px",
     width: "16px",
+    padding: "10px",
     marginLeft: "5px",
+    
+    backgroundImage: `url(${ url })`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
   }
   return <div style={ _style }> </div>
 }
-const ButtonStrip = (props) => {
-  const _style = {
-    marginLeft: "auto",
-    // width: "5em",
-    display: "flex",
-    justifyContent: "space-between",
-  }
 
-  const _fa_extra = {
-    filter: "drop-shadow(0 0 2px #000)"
-  }
-
-  return (
-    <div
-      style={ _style }
-    >
-      <div className={"square_btn"}>
-        <FontAwesomeIcon icon={faThumbtack} size="lg"/>
-      </div>
-      <div className={"square_btn"}>
-      <FontAwesomeIcon icon={faClone} size="lg"/>
-      </div>
-      <div className={"square_btn"}>
-      <FontAwesomeIcon icon={faWindowClose} size="lg"/>
-      </div>
-    </div>
-  )
-}
 export const Tab_ = ({ item, state, setState, index, ind }) => {
 
   const [globalState, globalActions] = useGlobal();
   const _style_wrapper = {
     display: "flex",
     fontSize: "13px",
+    alignItems: "center",
   },
   _style_title = {
     textOverflow: "ellipsis",
     overflow: "hidden",
     whiteSpace: "nowrap",
-    marginLeft: "15px",
+    marginLeft: "10px",
     maxWidth: "65%",
   },
   _style_buttons = {
@@ -66,12 +47,13 @@ export const Tab_ = ({ item, state, setState, index, ind }) => {
 
   return (
     <div style={ _style_wrapper }>
-      <FavIcon url={ item.url } />
+      <FavIcon url={ item.favIconUrl } />
+      {/* <FavIcon url={ item.url } /> */}
       <div style={ _style_title }>
         { `${item.id}|${item.index}`} { item.title }
       </div>
 
-      <ButtonStrip/>
+      <ButtonStrip item={item}/>
       {/* <button
         style={_style_buttons}
         type="button"
@@ -96,7 +78,7 @@ export const Tab = ({ item, state, setState, index, ind }) => {
           { ...provided.dragHandleProps }
           className={ "tab" + `${snapshot.isDragging? ' isDragging':'' }` }
           // style={ getItemStyle(snapshot.isDragging, provided.draggableProps.style) }
-        >
+        >          
           <Tab_
             item={ item }
             index={ index }

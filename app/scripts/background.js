@@ -1,16 +1,67 @@
 import browser from 'webextension-polyfill';
 
-// import { DEFAULT_OPTIONS } from './libs/datamodel';
-// import { promisify } from './libs/utils';
 import { getOverlappingMonitor } from './libs/multiScreen';
+import { handleMessagePassing } from './libs/onMessageHook';
 
-import { handleMessagePassing } from './libs/onMessageHook'
 import './libs/contextMenu'
 import './libs/bgEvents'
+import { ChromeRPC } from './libs/utils';
 
 let DEBUG = true
 let OPENED_POPUP = []
 let __clipboardContent = ''
+
+
+let portFromPOPUP;
+
+// browser.runtime.onConnect.addListener(handleMessagePassing);
+browser.runtime.onConnect.addListener((port) => {
+    portFromPOPUP = port
+    port.onMessage.addListener(async (request) => {
+
+        if (request.POPUP_INFO) {
+            // console.log("parsed POPUP_INFO", POPUP_INFO)
+            sendResponse({ POPUP_INFO_RES: "Received the POPUP_INFO" });
+            portFromPOPUP?.postMessage({ POPUP_INFO: JSON.stringify(...OPENED_POPUP) })
+            POPUP_INFO = await JSON.parse(request.POPUP_INFO)
+          }
+    
+          // requests to background <==
+          if (request.MOVE_TAB) {
+            const data = request.MOVE_TAB
+            const [tabId, sI, wId, tIdx] = data.split(',').map(x => +x)
+            if (wId)
+              await browser.tabs.move([tabId], { windowId: wId, index: tIdx || -1 })
+            else
+              await browser.windows.create({ tabId: tabId })
+            return 
+          }
+          
+          if (request.TOGGLE_PIN) {
+            const data = request.TOGGLE_PIN
+            const [tabId, ..._] = data.split(',').map(x => +x)
+            chrome.tabs.update(tabId, { pinned: !(await browser.tabs.get(tabId))?.pinned })
+            return 
+          }
+    
+          if (request.BRING_FORWARD) {
+            const data = request.BRING_FORWARD
+            const [windowId, tabIndex] = data.split(',').map(x => +x)
+            await browser.windows.update(windowId, {focused: true})
+            await browser.tabs.highlight({ windowId: windowId, tabs: tabIndex })
+            // await browser.windows.update((await browser.windows.getLastFocused())?.id, {focused: true})
+          }
+    
+          if (request.CLOSE_TAB) {
+            const data = request.CLOSE_TAB
+            const [tabId, ..._] = data.split(',').map(x => +x)
+            await browser.tabs.remove([tabId])
+          }
+    
+    })
+})
+
+handleMessagePassing()
 
 chrome.browserAction.onClicked.addListener(async() => {
     console.log('OPENING FROM BACKGROUND');
@@ -22,7 +73,8 @@ chrome.browserAction.onClicked.addListener(async() => {
     const parentConfig = {
         'width': parseInt(currentMonitor.width * (3 / 4)),
         // 'height': currentMonitor.height,
-        'height': parseInt(currentMonitor.height * (4 / 5)),
+        // 'height': parseInt(currentMonitor.height * (4 / 5)),
+        'height': parseInt(currentMonitor.height * (2 / 4)),
         'left': currentMonitor.left,
         'top': currentMonitor.top
     };
@@ -39,7 +91,7 @@ chrome.browserAction.onClicked.addListener(async() => {
         let _parentId =  parentWindow.id != parentId ? parentWindow.id: parentId
         console.log("_parentId = ",_parentId, popupWindowId)
         await chrome.windows.update(popupWindowId, {drawAttention: true, ...appConfig }, (w) => console.log(w));
-        await chrome.windows.update(_parentId, {drawAttention: true, ...parentConfig }, (w) => console.log(w));
+        await chrome.windows.update(_parentId, { drawAttention: true, ...parentConfig }, (w) => console.log(w));
 
     } else {
         chrome.windows.create({
@@ -54,23 +106,24 @@ chrome.browserAction.onClicked.addListener(async() => {
                 popupTabId: appWindow.tabs[0].id,
                 parentId: parentWindow.id
             })
-            console.log("OPENED_POPUP =", OPENED_POPUP)
+                console.log("OPENED_POPUP =", OPENED_POPUP)
         });
     }
-
-    chrome.windows.onRemoved.addListener((id) => {
-        console.log("closing window id = ",id)
-        console.log(OPENED_POPUP)
-        OPENED_POPUP = OPENED_POPUP.filter(x => x.popupWindowId != id)
-        console.log("filtered after removed =", OPENED_POPUP)
-    })
-
-
+    portFromPOPUP?.postMessage({ POPUP_INFO: JSON.stringify(...OPENED_POPUP) })
     // chrome.developerPrivate.openDevTools({ extensionId: "nnlfihnjlcnpiddiilpmobjncpbhagnm" }, () => { console.log('DevTool Opened')})
 
 });
 
-handleMessagePassing()
+
+
+
+chrome.windows.onRemoved.addListener((id) => {
+    console.log("closing window id = ",id)
+    console.log(OPENED_POPUP)
+    OPENED_POPUP = OPENED_POPUP.filter(x => x.popupWindowId != id)
+    console.log("filtered after removed =", OPENED_POPUP)
+})
+
 
 /*
  * Chrome.browserAction.setBadgeText({ text: `${displayText}` })
@@ -149,6 +202,7 @@ browser.webRequest?.onBeforeRequest.addListener((req) => {
 const TS2 = {
     browser,
     // DEFAULT_OPTIONS,
+    OPENED_POPUP,
     console // Xpose the console here to share it with the popup
 };
 

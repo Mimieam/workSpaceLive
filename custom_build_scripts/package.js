@@ -1,12 +1,9 @@
 const path = require("path")
 const fs = require("fs");
 const ChromeExtension = require("crx");
-// const paths = require('../config/paths');
-// const appName = require(paths.appPackageJson).name;
 
 const manifestInfo = require('../dist/manifest.json');
 const extInfo = require('../dist/_locales/en/messages.json');
-// const argv = require('minimist')(process.argv.slice(2));
 
 const name = extInfo.appName.message;
 const version = manifestInfo.version;

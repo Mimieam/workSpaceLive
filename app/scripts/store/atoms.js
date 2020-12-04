@@ -2,7 +2,7 @@ import { atom, selector, useRecoilState, useRecoilValue } from "recoil";
 
 //initial State
 const initialStateMap = {
-  element1: "defaultValue1",
+  tabs: [],
   element2: "defaultValue2",
   element3: "defaultValue3",
 }
@@ -14,7 +14,7 @@ const createAtoms = (stateDictionary) => {
   const arrOfAtoms = Object
     .entries(stateDictionary)
     .map(([key, value]) => { return {[key]: atom({ key: key, default: value })} })
-  
+
   return Object.assign({}, ...arrOfAtoms)
 }
 

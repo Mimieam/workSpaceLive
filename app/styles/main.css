@@ -2,10 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* @import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities"; */
+
 /*
 popup body is regulated by this css body...
 anything above 800px and 600px width is ignored...
-
 */
 
 
@@ -88,14 +91,26 @@ html::-webkit-scrollbar {
   max-height: -webkit-fill-available;
 }
 
+.windowColumn{
+  margin: 5px;
+}
+
 .windowTitle {
   align-self: flex-end;
   font-size: small;
   margin-bottom: -10px;
+  margin-right: 5px;
   background: var(--background-color);
   padding: 1px;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
+}
+
+.resizeThis {
+  resize: both;
+  max-height: 400px;
+  margin-right: 10px;
+  overflow:scroll;
 }
 
 .tab {

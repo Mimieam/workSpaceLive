@@ -21,7 +21,10 @@
     "storage",
     "chrome://favicon/",
     "contextMenus",
-    "system.display"
+    "system.display",
+
+    "alwaysOnTopWindows",
+    "webview"
   ],
   "browser_action": {
     "default_icon": {
@@ -50,5 +53,5 @@
       "description": "Open all copied urls"
     }
   },
-  "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'; img-src chrome://favicon;"
+  "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self';"
 }
