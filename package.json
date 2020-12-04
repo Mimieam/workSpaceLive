@@ -35,7 +35,7 @@
     "mobx": "^5.15.4",
     "moment": "^2.26.0",
     "parcel-plugin-purgecss": "^3.0.0",
-    "react": "16.x",
+    "react": "^16.13.1",
     "react-beautiful-dnd": "^13.0.0",
     "react-dom": "^16.9.0",
     "react-dropzone": "^10.2.2",
@@ -46,6 +46,7 @@
     "systeminformation": "^4.25.1",
     "tailwindcss": "^1.4.4",
     "use-global-hook": "^0.1.12",
+    "web-ext": "^5.4.0",
     "webextension-polyfill": "^0.6.0"
   },
   "devDependencies": {

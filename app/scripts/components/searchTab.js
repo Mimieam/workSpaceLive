@@ -13,9 +13,9 @@
 'use strict'
 
 import Fuse from 'fuse.js'
-import { promisify, asyncPromisify } from './utils'
+// import { promisify, asyncPromisify } from './utils'
 
-const getAllTabs = asyncPromisify(chrome.tabs.query)
+// const getAllTabs = asyncPromisify(chrome.tabs.query)
 
 class MiniTab {
     constructor(id,title,url,content=''){
