@@ -20,6 +20,7 @@ anything above 800px and 600px width is ignored...
   --main-color: #a5ffd6;
   --accent-color: #6d6875;
   --text-color: #ecf0f1;
+  --alternative-text-color: #a0aec0;
   --background-color: #4a4e69;
   --text-size: 15px;
   --icon-size: 27px;
@@ -133,7 +134,7 @@ html::-webkit-scrollbar {
   @apply border-solid border-l-4 rounded-lg my-2;
   padding: 2px;
   width: 100%;
-  margin-bottom: 5px; 
+  margin-bottom: 5px;
   background:var(--background-color);
   border-bottom-right-radius: 4px;
   border-top-right-radius: 4px;
@@ -143,4 +144,12 @@ html::-webkit-scrollbar {
 
 .wrapper.isDragging {
   background: var(--main-color);
+}
+
+.appHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    justify-items: baseline;
+    align-items: baseline;
 }

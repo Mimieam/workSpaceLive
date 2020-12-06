@@ -8,28 +8,40 @@ import Tab, { Tab_} from './Tab'
 import useGlobal from './store';
 // import styled from '@emotion/styled';
 import Sidebar from './Sidebar'
+import { tabState, initialTabState, isSearchingState } from '../store/atoms'
 
 // import '../../styles/main.css'
 import { ChromeRPC } from "../libs/utils";
 import { port, useChromeMessagePassing } from '../libs/onMessageHook'
 
-import { NanoFuzz, nFuse } from './searchTab'
-
+// import { NanoFuzz, nFuse } from './searchTab'
+import {SearchBar} from './Search'
 
 export default function App() {
-  const [state, setState] = useState([]);
+  // const [state, setState] = useState([]);
+  const [state, setState] = useRecoilState(tabState);
+  const [fetchedTabs, setFetchedTabs] = useRecoilState(initialTabState);
+  const [isSearching, setIsSearching] = useRecoilState(isSearchingState);
+
   const [globalState, globalActions] = useGlobal();
+
+  console.log('App - reloaded??')
 
   useChromeMessagePassing(setState)
 
   useEffect(() => {
+    // console.log('Use effect-?')
     const fetchCurrentWindows = async () => {
       const windows = await browser.windows.getAll({ populate: true })
       const tabs = windows.map(w => w.tabs)
+      setFetchedTabs(tabs)
+      // console.log("fetchedTabs 0", fetchedTabs)
       setState([...tabs, []])
     }
+    // console.log("fetchedTabs 1", fetchedTabs)
 
     fetchCurrentWindows();
+    // console.log("fetchedTabs 2", fetchedTabs)
     return () => { }
   }, []);
 
@@ -97,14 +109,15 @@ export default function App() {
 
   // remove the empty spot used to initialize the state and the
   // const _state = state.filter(w=>w.length).filter(w=>!(w[0].url == `chrome-extension://${browser.runtime.id}/popup.html`))
-  console.log("App state: ", state)
+  console.log("App state: ", fetchedTabs, state)
   // console.log("filtered App state: ", _state)
+        // { globalState.counter }
   return (
     <div>
       {/* <Sidebar/> */}
-      <div>
-        WorkSpaceLive
-        { globalState.counter }
+      <div className="appHeader">
+        <div className=" font-light text-base pl-4 pt-2"> WorkSpaceLive </div>
+        <SearchBar />
       </div>
       <div className={ "windowColumn" } style={ { display: "flex", flexDirection: 'column' } }>
         <DragDropContext onDragEnd={ onDragEnd }>

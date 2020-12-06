@@ -1,6 +1,6 @@
 import { atom, selector, useRecoilState, useRecoilValue } from "recoil";
 
-vAction = {
+const Action = {
   state: atomKey,
   action: () => { }
 }
@@ -13,7 +13,7 @@ const inputState = selector({
 });
 
 
-createSelectors = { 
+createSelectors = {
   useRecoilState(inputState);
 }
 

@@ -1,3 +1,4 @@
+
 .square_btn{
   padding: 0.1em;
   min-width: 2.2em;
@@ -13,7 +14,6 @@
   color: var(--main-color);
   border: solid 2px var(--main-color);
   border-radius: 3px;
-
 }
 
 .square_btn:active {
@@ -26,4 +26,29 @@
   border-bottom: 3px solid var(--main-color);
   border-bottom-right-radius: 1px;
   border-bottom-left-radius: 1px;
+}
+
+input[type="search"]{
+  /*background: var(--main-color);*/
+  /*color: var(--accent-color);*/
+}
+
+input[type="search"]:focus {
+  caret-color: var(--alternative-text-color);
+  color: var(--alternative-text-color);
+}
+
+/*style the default cancel button on search input*/
+input[type="search"]::-webkit-search-cancel-button {
+  appearance: none;
+  height: 1em;
+  width: 1em;
+  background-color: var(--alternative-text-color);
+  -webkit-mask-image: url(../../../node_modules/@fortawesome/fontawesome-free/svgs/solid/times.svg);
+  -webkit-mask-position: 50%;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+
+  /*background: url('../../../node_modules/@fortawesome/fontawesome-free/svgs/solid/times.svg') no-repeat 50% 50%;*/
+
 }

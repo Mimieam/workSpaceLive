@@ -1,48 +1,84 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Fuse from 'fuse.js'
+import { tabState, initialTabState, isSearchingState } from '../store/atoms'
+import { atom, selector, useRecoilState, useRecoilValue } from "recoil";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
-export class NanoFuzz {
-    constructor(dataSet, options) {
-        this.dataSet = dataSet
-        this.options = { keys: [{ name: 'title', weight: 0.8 }, { name: 'url', weight: 0.2 }], shouldSort: true, caseSensitive: false, threshold: 0.5 }
-        this._fuse_engine = new Fuse(this.dataSet, this.options)
-    }
-    search =(targetStr) => this._fuse_engine.search(targetStr)
+var fuse_options = {
+    keys: [{
+        name: 'title',
+        weight: 0.8
+    }, {
+        name: 'url',
+        weight: 0.2
+    }],
+    shouldSort: true,
+    caseSensitive: false,
+    // tokenize: true,
+    // matchAllTokens: true,
+    threshold: 0.3,
+};
 
-    addToDataSet =(data) => {
-        this.dataSet.push(data)
-        this._fuse_engine.setCollection(this.dataSet)
-    }
-    removeById = (id) => this._fuse_engine.setCollection(this.dataSet.filter(item => item.id != id))
-
-    onInputHandler = async (ev) => {
-        this.currentInputValue = ev.target.value
-
-        if (!this.currentInputValue){
-            return false;
-        }
-        let results = this.nFuse.search(this.currentInputValue)
-        results.splice(this.display_last_x_results) // remove everything after the first X items
-        // console.log(ev.target.value, results)
-        let resultHTML =
-            `<div style="${this._style}" class="${this._className.join(' ')}">
-               ${
-                   results.map(data => {
-                    return "<div>"+ data.url + "</div>"
-                   }).join('\n')
-                }
-            </div>`
-
-        this.displayElement.innerHTML = resultHTML
-    }
-}
-
-export let nFuse = new NanoFuzz(dataSet)
+const nFuse = new Fuse([], fuse_options)
+const searchStack = []
 
 export const SearchBar = (props) => {
 
-  return (
-     <div className={}>
+  const [state, setState] = useRecoilState(tabState);
+  const [fetchedTabs, setFetchedTabs] = useRecoilState(initialTabState);
+  const [isSearching, setIsSearching] = useRecoilState(isSearchingState);
 
-     </div>
+  nFuse.setCollection(state)
+
+  const onSearch = (event)=>{
+    let {currentTarget} = event
+    const targetValue = currentTarget.value
+
+    if (!targetValue) {
+        setIsSearching(false)
+        return setState(fetchedTabs)
+    }
+
+    setIsSearching(true)
+
+    // here we are searching each window... we could do it all at once by flattening ... but NOPE it screws up the display!
+    let searchRes = []
+    let _res;
+
+    // arr = arr of tabs
+    fetchedTabs.map( arr => {
+      nFuse.setCollection(arr)
+      let _res = nFuse.search(targetValue).map(x => x.item)
+      _res.length ? searchRes.push(_res) : ''
+    })
+
+    setState(searchRes)
+
+  }
+
+
+      {/*{<input type="text" placeholder="Q - search" onChange={onSearch}/>}*/}
+            {/*className="py-2 text-sm text-white bg-gray-900 text-base rounded-md pl-10 focus:outline-none focus:bg-white focus:text-gray-900 focus:shadow-outline"*/}
+  return (
+    <div className="flex items-center justify-end pr-2 pt-2 ">
+        <div className="relative text-gray-600 focus-within:text-gray-300">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-2">
+            <button type="submit" className="p-1 focus:outline-none text-base">
+              <FontAwesomeIcon icon={faSearch} size="1x" />
+            </button>
+          </span>
+          <input
+            type="search"
+            name="q"
+            className="py-2 text-sm font-normal bg-gray-800 text-base text-gray-600 focus-within:text-gray-300 rounded-md pl-10 focus:outline-none focus:bg-white focus:text-gray-900 focus:shadow-outline"
+            placeholder="Search..."
+            autoComplete="off"
+            onChange={onSearch}
+             />
+        </div>
+    </div>
   )
 }
+
+export default SearchBar

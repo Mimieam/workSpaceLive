@@ -19,3 +19,19 @@ const createAtoms = (stateDictionary) => {
 }
 
 const initialState = createAtoms(initialStateMap)
+
+
+export const tabState = atom({
+  key: 'tabs',
+  default: [],
+});
+
+export const initialTabState = atom({
+  key: 'initialTabs',
+  default: [],
+});
+
+export const isSearchingState = atom({
+  key: 'isSearching',
+  default: false,
+});
