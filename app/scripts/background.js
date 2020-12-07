@@ -19,13 +19,13 @@ browser.runtime.onConnect.addListener((port) => {
     portFromPOPUP = port
     port.onMessage.addListener(async (request) => {
 
-        if (request.POPUP_INFO) {
-            // console.log("parsed POPUP_INFO", POPUP_INFO)
-            sendResponse({ POPUP_INFO_RES: "Received the POPUP_INFO" });
+        if (request.GET_POPUP_INFO) {
+            console.log("GET_POPUP_INFO:  ", request.GET_POPUP_INFO)
+            // sendResponse({ POPUP_INFO_RES: "Received the POPUP_INFO" });
             portFromPOPUP?.postMessage({ POPUP_INFO: JSON.stringify(...OPENED_POPUP) })
-            POPUP_INFO = await JSON.parse(request.POPUP_INFO)
+            // POPUP_INFO = await JSON.parse(request.POPUP_INFO)
           }
-    
+
           // requests to background <==
           if (request.MOVE_TAB) {
             const data = request.MOVE_TAB
@@ -34,30 +34,36 @@ browser.runtime.onConnect.addListener((port) => {
               await browser.tabs.move([tabId], { windowId: wId, index: tIdx || -1 })
             else
               await browser.windows.create({ tabId: tabId })
-            return 
+            return
           }
-          
+
           if (request.TOGGLE_PIN) {
             const data = request.TOGGLE_PIN
             const [tabId, ..._] = data.split(',').map(x => +x)
             chrome.tabs.update(tabId, { pinned: !(await browser.tabs.get(tabId))?.pinned })
-            return 
+            return
           }
-    
+
           if (request.BRING_FORWARD) {
+            console.log(request.BRING_FORWARD)
             const data = request.BRING_FORWARD
             const [windowId, tabIndex] = data.split(',').map(x => +x)
             await browser.windows.update(windowId, {focused: true})
             await browser.tabs.highlight({ windowId: windowId, tabs: tabIndex })
-            // await browser.windows.update((await browser.windows.getLastFocused())?.id, {focused: true})
+            const lastID = (await browser.windows.getLastFocused())?.id
+            console.log(`lastID = ${lastID}`)
+            const { popupWindowId, parentId } = OPENED_POPUP[0]
+
+            await browser.windows.update(popupWindowId, {focused: true})
+            await browser.tabs.highlight({ windowId: popupWindowId, tabs: 0 })
           }
-    
+
           if (request.CLOSE_TAB) {
             const data = request.CLOSE_TAB
             const [tabId, ..._] = data.split(',').map(x => +x)
             await browser.tabs.remove([tabId])
           }
-    
+
     })
 })
 
@@ -68,13 +74,13 @@ chrome.browserAction.onClicked.addListener(async() => {
     const currentMonitor = await getOverlappingMonitor()
     console.log(currentMonitor)
     const parentWindow = await browser.windows.getCurrent();
-    
+
 
     const parentConfig = {
         'width': parseInt(currentMonitor.width * (3 / 4)),
         // 'height': currentMonitor.height,
-        // 'height': parseInt(currentMonitor.height * (4 / 5)),
-        'height': parseInt(currentMonitor.height * (2 / 4)),
+        'height': parseInt(currentMonitor.height * (4 / 5)),
+        // 'height': parseInt(currentMonitor.height * (2 / 4)),
         'left': currentMonitor.left,
         'top': currentMonitor.top
     };
@@ -90,8 +96,10 @@ chrome.browserAction.onClicked.addListener(async() => {
         const { popupWindowId, parentId } = OPENED_POPUP[0]
         let _parentId =  parentWindow.id != parentId ? parentWindow.id: parentId
         console.log("_parentId = ",_parentId, popupWindowId)
-        await chrome.windows.update(popupWindowId, {drawAttention: true, ...appConfig }, (w) => console.log(w));
-        await chrome.windows.update(_parentId, { drawAttention: true, ...parentConfig }, (w) => console.log(w));
+        await browser.windows.update(popupWindowId, {focused: true})
+        await browser.tabs.highlight({ windowId: popupWindowId, tabs: 0 })
+        // await chrome.windows.update(popupWindowId, {drawAttention: true, ...appConfig }, (w) => console.log(w));
+        // await chrome.windows.update(_parentId, { drawAttention: true, ...parentConfig }, (w) => console.log(w));
 
     } else {
         chrome.windows.create({
@@ -137,7 +145,7 @@ document.addEventListener('copy', (e) => {
 
 const copyUrlsToClipboard = () => {
 
-    
+
  }
 
 const openUrls = async (_urls, windowId) => {
@@ -155,16 +163,16 @@ const openUrls = async (_urls, windowId) => {
 
 browser.commands.onCommand.addListener(async (command) => {
     const w = await browser.windows.getCurrent({ populate: true });
-    
+
     switch (command) {
-        case 'copy_all_url': 
+        case 'copy_all_url':
             const text = w.tabs.flatMap(t => t.url).filter(x => x).join(',\n')
             __clipboardContent = text
             document.execCommand('copy')
             console.log('Command:', command);
             console.log(__clipboardContent)
             break;
-        case 'open_copied_url': 
+        case 'open_copied_url':
             const url = __clipboardContent.split(',\n')
             console.log(url)
             const res = openUrls(url, w.id)
@@ -181,13 +189,13 @@ browser.commands.onCommand.addListener(async (command) => {
 *   "<all_urls>",
  *  "webRequest",
     "webRequestBlocking",
- * */ 
+ * */
 browser.webRequest?.onBeforeRequest.addListener((req) => {
     OPENED_POPUP.some(x => {
         console.log(x.popupTabId,  req.tabId, x.popupTabId == req.tabId)
         return x.popupTabId == req.tabId
     })
-    
+
     if (OPENED_POPUP.some(x => x.popupTabId == req.tabId) && !req.url.includes('nnlfihnjlcnpiddiilpmobjncpbhagnm')) {
         console.log("BLOCKED - ", req.url, req.tabId)
         return {redirectUrl: 'chrome-extension://nnlfihnjlcnpiddiilpmobjncpbhagnm/popup.html'};

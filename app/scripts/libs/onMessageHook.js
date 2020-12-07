@@ -8,6 +8,10 @@ export let port = browser.runtime.connect({ name: "portFromPopup" });
 
 
 export const handleMessagePassing = (setState) => {
+
+//  this notify the background to send the POPUP_INFO ...  because the popup.html does not know it's own window/tab ID
+  // port.postMessage({"GET_POPUP_INFO": "Popup is Open and Connected"})
+
   // port.onMessage.addListener(
   chrome.runtime.onMessage.addListener(
     async function (request, sender, sendResponse) {
@@ -36,14 +40,14 @@ export const handleMessagePassing = (setState) => {
       //     await browser.tabs.move([tabId], { windowId: wId, index: tIdx || -1 })
       //   else
       //     await browser.windows.create({ tabId: tabId })
-      //   return 
+      //   return
       // }
-      
+
       // if (request.TOGGLE_PIN) {
       //   const data = request.TOGGLE_PIN
       //   const [tabId, ..._] = data.split(',').map(x => +x)
       //   chrome.tabs.update(tabId, { pinned: !(await browser.tabs.get(tabId))?.pinned })
-      //   return 
+      //   return
       // }
 
       // if (request.BRING_FORWARD) {

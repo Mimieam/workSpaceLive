@@ -35,13 +35,13 @@ export default function App() {
       const windows = await browser.windows.getAll({ populate: true })
       const tabs = windows.map(w => w.tabs)
       setFetchedTabs(tabs)
-      // console.log("fetchedTabs 0", fetchedTabs)
+      console.log("fetchedTabs 0", fetchedTabs)
       setState([...tabs, []])
     }
-    // console.log("fetchedTabs 1", fetchedTabs)
+    console.log("fetchedTabs 1", fetchedTabs)
 
     fetchCurrentWindows();
-    // console.log("fetchedTabs 2", fetchedTabs)
+    console.log("fetchedTabs 2", fetchedTabs)
     return () => { }
   }, []);
 
@@ -153,3 +153,9 @@ export default function App() {
     </div>
   );
 }
+
+
+// document.addEventListener("mouseover", ()=>{
+//   // port.postMessage({ BRING_FORWARD: `${ windowId },${ tabIndex}`})
+//   console.log("mouseover")
+// })

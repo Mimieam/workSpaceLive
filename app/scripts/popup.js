@@ -20,7 +20,7 @@ if (chrome && chrome.extension) {
   DEBUG && console.log("Background JS - loaded ?", backgroundJS)
   DEBUG && console.log("Background JS - TS2 ?", backgroundJS.ts2)
   console = backgroundJS.console
-  
+
   console.log("loaded");
 }
 

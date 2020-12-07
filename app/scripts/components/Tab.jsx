@@ -17,7 +17,7 @@ export const FavIcon = ({ url }) => {
     width: "16px",
     padding: "10px",
     marginLeft: "5px",
-    
+
     backgroundImage: `url(${ url })`,
     backgroundSize: "cover",
     backgroundPosition: "center",
@@ -45,12 +45,13 @@ export const Tab_ = ({ item, state, setState, index, ind }) => {
     marginLeft: "auto" ,
   }
 
+        // { `${item.id}|${item.index}`} { item.title }
   return (
     <div style={ _style_wrapper }>
       <FavIcon url={ item.favIconUrl } />
       {/* <FavIcon url={ item.url } /> */}
       <div style={ _style_title }>
-        { `${item.id}|${item.index}`} { item.title }
+        { item.title }
       </div>
 
       <ButtonStrip item={item}/>
@@ -78,7 +79,7 @@ export const Tab = ({ item, state, setState, index, ind }) => {
           { ...provided.dragHandleProps }
           className={ "tab" + `${snapshot.isDragging? ' isDragging':'' }` }
           // style={ getItemStyle(snapshot.isDragging, provided.draggableProps.style) }
-        >          
+        >
           <Tab_
             item={ item }
             index={ index }
