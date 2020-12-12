@@ -26,7 +26,7 @@ export const FavIcon = ({ url }) => {
   return <div style={ _style }> </div>
 }
 
-export const Tab_ = ({ item, state, setState, index, ind }) => {
+export const Tab_ = ({ item, index, ind }) => {
 
   const [globalState, globalActions] = useGlobal();
   const _style_wrapper = {
@@ -45,13 +45,13 @@ export const Tab_ = ({ item, state, setState, index, ind }) => {
     marginLeft: "auto" ,
   }
 
-        // { `${item.id}|${item.index}`} { item.title }
+        // { item.title }
   return (
     <div style={ _style_wrapper }>
       <FavIcon url={ item.favIconUrl } />
       {/* <FavIcon url={ item.url } /> */}
       <div style={ _style_title }>
-        { item.title }
+        { `${item.id}|${item.index}`} { item.title }
       </div>
 
       <ButtonStrip item={item}/>
@@ -67,7 +67,7 @@ export const Tab_ = ({ item, state, setState, index, ind }) => {
 }
 
 
-export const Tab = ({ item, state, setState, index, ind }) => {
+export const Tab = ({ item, index, ind }) => {
     return (
       <Draggable key={ item.id } draggableId={ `${ item.id }` } index={ index }>
         { (provided, snapshot) => {
@@ -83,8 +83,6 @@ export const Tab = ({ item, state, setState, index, ind }) => {
           <Tab_
             item={ item }
             index={ index }
-            state={ state }
-            setState={ setState }
             ind={ ind }
           />
         </div>

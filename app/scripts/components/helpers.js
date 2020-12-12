@@ -43,7 +43,7 @@ export  const getListStyle = isDraggingOver => ({
   background: isDraggingOver ? "lightblue" : "lightgrey",
   padding: '2px',
   width: '100%',
-  marginBottom: '5px' 
+  marginBottom: '5px'
 });
 
 

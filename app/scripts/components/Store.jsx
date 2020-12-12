@@ -6,6 +6,7 @@ const initialState = {
   entities: [],
   selectedTaskIds: [],
   draggingTaskId: null,
+  state: [],
 };
 
 const actions = {
@@ -13,6 +14,9 @@ const actions = {
     const newCounterValue = store.state.counter + amount;
     store.setState({ counter: newCounterValue });
   },
+  setState: ( store, tabs) => {
+    store.setState({state: tabs})
+  }
 };
 
 export default globalHook(React, initialState, actions);

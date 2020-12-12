@@ -1,7 +1,7 @@
 import React, { Component, useState, useEffect, Fragment } from "react";
 import browser from 'webextension-polyfill';
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { useRecoilState } from 'recoil'
+import { useRecoilState , useSetRecoilState, useRecoilValue} from 'recoil'
 
 import { getItems, reorder, getItemStyle,getListStyle ,move } from './helpers'
 import Tab, { Tab_} from './Tab'
@@ -16,18 +16,37 @@ import { port, useChromeMessagePassing } from '../libs/onMessageHook'
 
 // import { NanoFuzz, nFuse } from './searchTab'
 import {SearchBar} from './Search'
+import {ErrorHook} from './Error'
 
+let reload = 0
 export default function App() {
-  // const [state, setState] = useState([]);
-  const [state, setState] = useRecoilState(tabState);
+  reload += 1
+  const [state, setState] = useState([]);
+  const [warning, setWarning] = useState("");
+  const [error, setError] = useState(null);
+
   const [fetchedTabs, setFetchedTabs] = useRecoilState(initialTabState);
   const [isSearching, setIsSearching] = useRecoilState(isSearchingState);
+/*
+BUG: https://github.com/facebookexperimental/Recoil/issues/496
+https://github.com/facebookexperimental/Recoil/issues/307
+  const [state, setState] = useState([]);     VS   const [state, setState] = useRecoilState(tabState);
+recoilJS causes a double rendering leading to layout shifts with React Beautify DnD which makes the animation terrible
+until that's solved, we can either pass the state to the child components or use this Global hook work around... not a fan of either solutions..
+*/
 
-  const [globalState, globalActions] = useGlobal();
+  const triggerError = (msg) =>{
+    setError(msg)
 
-  console.log('App - reloaded??')
 
-  useChromeMessagePassing(setState)
+    return
+  }
+
+  console.log('App - reloaded?? - ' , reload, state)
+
+
+
+  useChromeMessagePassing(setState, setFetchedTabs)
 
   useEffect(() => {
     // console.log('Use effect-?')
@@ -36,7 +55,8 @@ export default function App() {
       const tabs = windows.map(w => w.tabs)
       setFetchedTabs(tabs)
       console.log("fetchedTabs 0", fetchedTabs)
-      setState([...tabs, []])
+      await setState([...tabs, []])
+      // setRState(tabs)
     }
     console.log("fetchedTabs 1", fetchedTabs)
 
@@ -51,7 +71,21 @@ export default function App() {
     const destinationWindowId = state[dInd]? state[dInd][0]?.windowId: ''
     const destinationTabIndex = destination?.index
 
-    port.postMessage({ MOVE_TAB: `${ sourceTabId }, ${ sourceTabIndex }, ${ destinationWindowId }, ${ destinationTabIndex }` })
+    if (!isSearching){
+      port.postMessage({ MOVE_TAB: `${ sourceTabId }, ${ sourceTabIndex }, ${ destinationWindowId }, ${ destinationTabIndex }` })
+      console.log("MOVE_TAB")
+
+    } else {
+      console.log('CANT move tab while searching... indexes aren\'t the same...', { MOVE_TAB: `${ sourceTabId }, ${ sourceTabIndex }, ${ destinationWindowId }, ${ destinationTabIndex }` })
+      // const sourceTabId = state[sInd][source.index]?.id
+      // const destinationWindowId = state[dInd]? state[dInd][0]?.windowId: ''
+      const trueSourceTabIndex = state[sInd][sourceTabIndex]?.index
+      const trueDestinationTabIndex = state[dInd][destinationTabIndex]?.index
+
+      console.log('trying to ... anyway...', { MOVE_TAB_2: `${ sourceTabId }, ${ trueSourceTabIndex }, ${ destinationWindowId }, ${ trueDestinationTabIndex }`})
+      triggerError("Can't currently move tabs while also searching.")
+      // port.postMessage({ MOVE_TAB: `${ sourceTabId }, ${ trueSourceTabIndex }, ${ destinationWindowId }, ${ trueDestinationTabIndex }`})
+    }
     // ChromeRPC.sendMessage({ MOVE_TAB: `${ sourceTabId }, ${ sourceTabIndex }, ${ destinationWindowId }, ${ destinationTabIndex }` },
     //   (data) => {
     //     console.log(data)
@@ -61,7 +95,7 @@ export default function App() {
   }
 
 
-  function onDragEnd(result) {
+  async function onDragEnd(result) {
     // state = state.filter(w=>w.length)
     const { source, destination } = result;
     console.log(source, destination)
@@ -78,8 +112,9 @@ export default function App() {
       newState[sInd] = result[sInd];
       newState[dInd] = result[dInd];
 
-      console.log(newState, [state[sInd][source.index]], dInd, result[dInd])
-      setState(newState.filter(group => group?.length));
+      // console.log(newState, [state[sInd][source.index]], dInd, result[dInd])
+      await setState(newState.filter(group => group?.length));
+      // setRState(state)
       format(state, sInd, dInd, source, destination)
       return;
     }
@@ -91,9 +126,11 @@ export default function App() {
       const newState = [...state];
       newState[sInd] = items;
       console.log('reOrder', sInd, state[sInd], source.index, source)
-      console.log(newState)
+      // console.log(newState)
 
-      setState(newState.filter(group => group?.length));
+      await setState(newState.filter(group => group?.length));
+      // console.log(state===newState)
+      // setRState(newState.filter(group => group?.length))
 
     } else {
       // const result = move(state[sInd], state[dInd], source, destination);
@@ -102,22 +139,21 @@ export default function App() {
       newState[sInd] = result[sInd];
       newState[dInd] = result[dInd];
 
-      setState(newState.filter(group => group?.length));
+      await setState(newState.filter(group => group?.length));
+      // setRState(state)
     }
     format(state, sInd, dInd, source, destination)
   }
 
-  // remove the empty spot used to initialize the state and the
-  // const _state = state.filter(w=>w.length).filter(w=>!(w[0].url == `chrome-extension://${browser.runtime.id}/popup.html`))
-  console.log("App state: ", fetchedTabs, state)
-  // console.log("filtered App state: ", _state)
-        // { globalState.counter }
   return (
-    <div>
+    <div className={"appWrapper"}>
       {/* <Sidebar/> */}
-      <div className="appHeader">
+      <div className="appHeader pt-2 pb-2 rounded-b bg-gray-900">
         <div className=" font-light text-base pl-4 pt-2"> WorkSpaceLive </div>
-        <SearchBar />
+        <SearchBar
+          state={state}
+          setState={setState}
+         />
       </div>
       <div className={ "windowColumn" } style={ { display: "flex", flexDirection: 'column' } }>
         <DragDropContext onDragEnd={ onDragEnd }>
@@ -149,7 +185,13 @@ export default function App() {
             </Droppable>
           )) }
         </DragDropContext>
-      </div>
+         { error && <ErrorHook
+                     delay={2000}
+                     message={error}
+                     dismiss={()=>setError(null)}
+                   />
+          }
+        </div>
     </div>
   );
 }

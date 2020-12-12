@@ -6,10 +6,10 @@ import { ChromeRPC } from './utils';
  * @param  ev   a chrome event
  */
 
-const THRESHOLD = 300
+const THRESHOLD = 500
 let start = Date.now();
 
-const browserEventListener = async (e_name) => {  
+const browserEventListener = async (e_name) => {
   if (Date.now() - start > THRESHOLD) {
     ChromeRPC.sendMessage({cmd: "REFRESH_STATE"}, (response) => {
       console.log(`[${e_name}] ev triggered [REFRESH_STATE] command. \n\t Output: `, response);

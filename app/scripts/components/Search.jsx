@@ -25,7 +25,8 @@ const searchStack = []
 
 export const SearchBar = (props) => {
 
-  const [state, setState] = useRecoilState(tabState);
+  const {state, setState}= props
+  // const [state, setState] = useRecoilState(tabState);
   const [fetchedTabs, setFetchedTabs] = useRecoilState(initialTabState);
   const [isSearching, setIsSearching] = useRecoilState(isSearchingState);
 
@@ -57,11 +58,8 @@ export const SearchBar = (props) => {
 
   }
 
-
-      {/*{<input type="text" placeholder="Q - search" onChange={onSearch}/>}*/}
-            {/*className="py-2 text-sm text-white bg-gray-900 text-base rounded-md pl-10 focus:outline-none focus:bg-white focus:text-gray-900 focus:shadow-outline"*/}
   return (
-    <div className="flex items-center justify-end pr-2 pt-2 ">
+    <div className="flex items-center justify-end pr-2">
         <div className="relative text-gray-600 focus-within:text-gray-300">
           <span className="absolute inset-y-0 left-0 flex items-center pl-2">
             <button type="submit" className="p-1 focus:outline-none text-base">

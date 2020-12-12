@@ -54,8 +54,8 @@ browser.runtime.onConnect.addListener((port) => {
             console.log(`lastID = ${lastID}`)
             const { popupWindowId, parentId } = OPENED_POPUP[0]
 
-            await browser.windows.update(popupWindowId, {focused: true})
-            await browser.tabs.highlight({ windowId: popupWindowId, tabs: 0 })
+            // await browser.windows.update(popupWindowId, {focused: true})
+            // await browser.tabs.highlight({ windowId: popupWindowId, tabs: 0 })
           }
 
           if (request.CLOSE_TAB) {
@@ -98,6 +98,7 @@ chrome.browserAction.onClicked.addListener(async() => {
         console.log("_parentId = ",_parentId, popupWindowId)
         await browser.windows.update(popupWindowId, {focused: true})
         await browser.tabs.highlight({ windowId: popupWindowId, tabs: 0 })
+        //
         // await chrome.windows.update(popupWindowId, {drawAttention: true, ...appConfig }, (w) => console.log(w));
         // await chrome.windows.update(_parentId, { drawAttention: true, ...parentConfig }, (w) => console.log(w));
 

@@ -28,6 +28,8 @@ anything above 800px and 600px width is ignored...
   --button-radius: 15px;
 }
 
+html { overflow-y: scroll }
+
 /* .lightTheme,
 .lightTheme .ts_theme {
   --main-color: #95a5a6;
@@ -94,6 +96,9 @@ html::-webkit-scrollbar {
 
 .windowColumn{
   margin: 5px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 2.8em;
 }
 
 .windowTitle {
@@ -152,4 +157,13 @@ html::-webkit-scrollbar {
     justify-content: space-between;
     justify-items: baseline;
     align-items: baseline;
+
+    position: fixed;
+    /* background: var(--background-color); */
+    width: 100%;
+}
+
+.appWrapper {
+  display: flex;
+  flex-direction: column;
 }

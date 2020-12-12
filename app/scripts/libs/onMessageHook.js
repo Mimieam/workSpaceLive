@@ -7,7 +7,7 @@ let POPUP_INFO = null
 export let port = browser.runtime.connect({ name: "portFromPopup" });
 
 
-export const handleMessagePassing = (setState) => {
+export const handleMessagePassing = (setState, setFetchedTabs) => {
 
 //  this notify the background to send the POPUP_INFO ...  because the popup.html does not know it's own window/tab ID
   // port.postMessage({"GET_POPUP_INFO": "Popup is Open and Connected"})
@@ -18,12 +18,16 @@ export const handleMessagePassing = (setState) => {
 
       // requests to React ==>
       if (request.cmd == "REFRESH_STATE") {
-        console.log("POPUP_INFO", POPUP_INFO)
-        port.postMessage({ cmd_res: "Windows State fetched and sent to React" });
+        console.log("bg::REFRESH_STATE")
+        sendResponse({ cmd_res: "Windows State fetched and sent to React" });
+                // port.postMessage({ cmd_res: "Windows State fetched and sent to React" });
         const windows = await browser.windows.getAll({ populate: true })
         const tabs = windows.filter(w => w.id != POPUP_INFO?.popupWindowId).map(w => w.tabs)
-        console.log("tabs", windows)
-        setState([...tabs, ...[]])
+        await setFetchedTabs(tabs)
+        setState(tabs)
+        console.log("tabs ~~~", windows)
+        // setState([...tabs, ...[]])
+        console.log("RESET INITIAL TABS")
       }
 
       if (request.POPUP_INFO) {
@@ -69,9 +73,9 @@ export const handleMessagePassing = (setState) => {
 
 // "sometime a man can be smart enought to be really stupid" ~ somebook
 
-export function useChromeMessagePassing(setState) {
+export function useChromeMessagePassing(setState, setFetchedTabs) {
   useEffect(() => {
-    handleMessagePassing(setState)
+    handleMessagePassing(setState, setFetchedTabs)
     return () => { }
   }, [])
 }

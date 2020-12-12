@@ -170,6 +170,8 @@ export const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+export const timeout = sleep
+
 // export const sleepFor = (time=1000, thenDo=()=>{}) => setTimeout(function(){
 //     // thenDo()
 //     console.log("DONESLEEPING!!!!!")
