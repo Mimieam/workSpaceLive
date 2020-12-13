@@ -7,14 +7,13 @@ import { getItems, reorder, getItemStyle,getListStyle ,move } from './helpers'
 import Tab, { Tab_} from './Tab'
 import useGlobal from './store';
 // import styled from '@emotion/styled';
-import Sidebar from './Sidebar'
-import { tabState, initialTabState, isSearchingState } from '../store/atoms'
+import SlideOver from './SlideOver'
+import { tabState, initialTabState, isSearchingState , sideBarState} from '../store/atoms'
 
 // import '../../styles/main.css'
 import { ChromeRPC } from "../libs/utils";
 import { port, useChromeMessagePassing } from '../libs/onMessageHook'
 
-// import { NanoFuzz, nFuse } from './searchTab'
 import {SearchBar} from './Search'
 import {ErrorHook} from './Error'
 
@@ -22,11 +21,12 @@ let reload = 0
 export default function App() {
   reload += 1
   const [state, setState] = useState([]);
-  const [warning, setWarning] = useState("");
+  
   const [error, setError] = useState(null);
 
   const [fetchedTabs, setFetchedTabs] = useRecoilState(initialTabState);
   const [isSearching, setIsSearching] = useRecoilState(isSearchingState);
+  const [isSideBarOpen, setIsSideBarOpen] = useRecoilState(sideBarState);
 /*
 BUG: https://github.com/facebookexperimental/Recoil/issues/496
 https://github.com/facebookexperimental/Recoil/issues/307
@@ -147,9 +147,17 @@ until that's solved, we can either pass the state to the child components or use
 
   return (
     <div className={"appWrapper"}>
-      {/* <Sidebar/> */}
+      {
+        <SlideOver
+        isOpen={ isSideBarOpen }
+        dismiss={ () => setIsSideBarOpen(false) }
+        />
+      }
+      
       <div className="appHeader pt-2 pb-2 rounded-b bg-gray-900">
-        <div className=" font-light text-base pl-4 pt-2"> WorkSpaceLive </div>
+        <div className="appTitle font-light text-base pl-4 pt-2"
+          onClick={ () => setIsSideBarOpen(!isSideBarOpen) }
+        > { `WorkSpace{Live}` } </div>
         <SearchBar
           state={state}
           setState={setState}
@@ -157,7 +165,8 @@ until that's solved, we can either pass the state to the child components or use
       </div>
       <div className={ "windowColumn" } style={ { display: "flex", flexDirection: 'column' } }>
         <DragDropContext onDragEnd={ onDragEnd }>
-          { state.map((el, ind) => (
+          {
+            state.map((el, ind) => (
           // { state.filter(w => w.length && w[0]?.title!="WorkspaceLive").map((el, ind) => (
             <Droppable key={ ind } droppableId={ `${ind}` }>
               { (provided, snapshot) => (
@@ -183,7 +192,8 @@ until that's solved, we can either pass the state to the child components or use
               </Fragment>
               ) }
             </Droppable>
-          )) }
+             ))
+          }
         </DragDropContext>
          { error && <ErrorHook
                      delay={2000}
@@ -197,7 +207,7 @@ until that's solved, we can either pass the state to the child components or use
 }
 
 
-// document.addEventListener("mouseover", ()=>{
-//   // port.postMessage({ BRING_FORWARD: `${ windowId },${ tabIndex}`})
-//   console.log("mouseover")
-// })
+document.addEventListener("mouseover", ()=>{
+  // port.postMessage({ BRING_FORWARD: `${ windowId },${ tabIndex}`})
+  console.log("mouseover")
+})

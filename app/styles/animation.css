@@ -21,5 +21,15 @@
 }
 
 .pulsate-fwd {
-  animation: pulsate-fwd 0.5s ease-in-out infinite both;
+  animation: pulsate-fwxd 0.5s ease-in-out infinite both;
+}
+
+
+@keyframes slidein {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }

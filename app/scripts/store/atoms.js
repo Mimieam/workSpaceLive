@@ -35,3 +35,8 @@ export const isSearchingState = atom({
   key: 'isSearching',
   default: false,
 });
+
+export const sideBarState = atom({
+  key: 'sideBarState',
+  default: false,
+});

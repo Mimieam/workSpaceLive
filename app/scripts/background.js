@@ -52,10 +52,12 @@ browser.runtime.onConnect.addListener((port) => {
             await browser.tabs.highlight({ windowId: windowId, tabs: tabIndex })
             const lastID = (await browser.windows.getLastFocused())?.id
             console.log(`lastID = ${lastID}`)
+            console.log(`OPENED_POPUP = ${OPENED_POPUP}`)
             const { popupWindowId, parentId } = OPENED_POPUP[0]
-
-            // await browser.windows.update(popupWindowId, {focused: true})
-            // await browser.tabs.highlight({ windowId: popupWindowId, tabs: 0 })
+            
+            await browser.windows.update(popupWindowId, {focused: true})
+            await browser.tabs.highlight({ windowId: popupWindowId, tabs: 0 })
+            console.log(`popupWindowId = ${popupWindowId}`)
           }
 
           if (request.CLOSE_TAB) {
