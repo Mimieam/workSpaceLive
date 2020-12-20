@@ -1,4 +1,6 @@
 'use strict';
+import browser from 'webextension-polyfill';
+
 import React from "react"
 import ReactDOM from "react-dom"
 // import styles from './../styles/main.css'
@@ -12,11 +14,11 @@ import { RecoilRoot } from 'recoil';
 // import { h, app } from "hyperapp"
 // import { observable, autorun } from "mobx"
 
-if (chrome && chrome.extension) {
+if (browser && browser.extension) {
 
-  let backgroundJS = chrome.extension.getBackgroundPage();
+  let backgroundJS = browser.extension.getBackgroundPage();
   let DEBUG = true;
-  DEBUG && console.log("chrome", chrome.extension)
+  DEBUG && console.log("browser", browser.extension)
   DEBUG && console.log("Background JS - loaded ?", backgroundJS)
   DEBUG && console.log("Background JS - TS2 ?", backgroundJS.ts2)
   console = backgroundJS.console

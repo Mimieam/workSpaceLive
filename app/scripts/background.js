@@ -18,11 +18,14 @@ let portFromPOPUP;
 browser.runtime.onConnect.addListener((port) => {
     portFromPOPUP = port
     port.onMessage.addListener(async (request) => {
-
+        console.log(request)
         if (request.GET_POPUP_INFO) {
-            console.log("GET_POPUP_INFO:  ", request.GET_POPUP_INFO)
+            console.log("GET_POPUP_INFO:  ", request.GET_POPUP_INFO, console.log(OPENED_POPUP))
             // sendResponse({ POPUP_INFO_RES: "Received the POPUP_INFO" });
-            portFromPOPUP?.postMessage({ POPUP_INFO: JSON.stringify(...OPENED_POPUP) })
+            console.log(port)
+            // port.sendMessage({ POPUP_INFO: JSON.stringify(...OPENED_POPUP) })
+            await portFromPOPUP.postMessage({ POPUP_INFO: JSON.stringify(...OPENED_POPUP) })
+            // portFromPOPUP?.postMessage({ POPUP_INFO: JSON.stringify(...OPENED_POPUP) })
             // POPUP_INFO = await JSON.parse(request.POPUP_INFO)
           }
 
@@ -40,24 +43,24 @@ browser.runtime.onConnect.addListener((port) => {
           if (request.TOGGLE_PIN) {
             const data = request.TOGGLE_PIN
             const [tabId, ..._] = data.split(',').map(x => +x)
-            chrome.tabs.update(tabId, { pinned: !(await browser.tabs.get(tabId))?.pinned })
+            browser.tabs.update(tabId, { pinned: !(await browser.tabs.get(tabId))?.pinned })
             return
           }
 
           if (request.BRING_FORWARD) {
-            console.log(request.BRING_FORWARD)
+            // console.log(request.BRING_FORWARD)
             const data = request.BRING_FORWARD
             const [windowId, tabIndex] = data.split(',').map(x => +x)
             await browser.windows.update(windowId, {focused: true})
             await browser.tabs.highlight({ windowId: windowId, tabs: tabIndex })
             const lastID = (await browser.windows.getLastFocused())?.id
-            console.log(`lastID = ${lastID}`)
-            console.log(`OPENED_POPUP = ${OPENED_POPUP}`)
+            // console.log(`lastID = ${lastID}`)
+            // console.log(`OPENED_POPUP =`, OPENED_POPUP)
             const { popupWindowId, parentId } = OPENED_POPUP[0]
             
             await browser.windows.update(popupWindowId, {focused: true})
             await browser.tabs.highlight({ windowId: popupWindowId, tabs: 0 })
-            console.log(`popupWindowId = ${popupWindowId}`)
+            // console.log(`popupWindowId = ${popupWindowId}`)
           }
 
           if (request.CLOSE_TAB) {
@@ -71,7 +74,7 @@ browser.runtime.onConnect.addListener((port) => {
 
 handleMessagePassing()
 
-chrome.browserAction.onClicked.addListener(async() => {
+browser.browserAction.onClicked.addListener(async() => {
     console.log('OPENING FROM BACKGROUND');
     const currentMonitor = await getOverlappingMonitor()
     console.log(currentMonitor)
@@ -94,24 +97,27 @@ chrome.browserAction.onClicked.addListener(async() => {
     };
 
     if (OPENED_POPUP.length) {
-        console.log("OPENED_POPUP =", OPENED_POPUP)
+        // console.log("OPENED_POPUP =")
+        // console.log(OPENED_POPUP)
         const { popupWindowId, parentId } = OPENED_POPUP[0]
         let _parentId =  parentWindow.id != parentId ? parentWindow.id: parentId
-        console.log("_parentId = ",_parentId, popupWindowId)
+        // console.log("_parentId = ",_parentId, popupWindowId)
         await browser.windows.update(popupWindowId, {focused: true})
         await browser.tabs.highlight({ windowId: popupWindowId, tabs: 0 })
         //
-        // await chrome.windows.update(popupWindowId, {drawAttention: true, ...appConfig }, (w) => console.log(w));
-        // await chrome.windows.update(_parentId, { drawAttention: true, ...parentConfig }, (w) => console.log(w));
+        browser.windows.update(popupWindowId, {drawAttention: true, ...appConfig }).then((w) => console.log(w));
+        browser.windows.update(_parentId, { drawAttention: true, ...parentConfig }).then((w) => console.log(w));
 
     } else {
-        chrome.windows.create({
+        browser.windows.create({
             'url': 'popup.html',
             'type': 'popup',
             ...appConfig
-        }, async(appWindow) => {
+        }).then(async (appWindow) => {
+            
             console.log('POP UP CREATED', appWindow.id, appWindow);
-            await chrome.windows.update(parentWindow.id, { ...parentConfig }, (pW) => console.log(pW));
+            await browser.windows.update(parentWindow.id, { ...parentConfig })
+            // await browser.windows.update(parentWindow.id, { ...parentConfig }, (pW) => console.log(pW));
             OPENED_POPUP.push({
                 popupWindowId: appWindow.id,
                 popupTabId: appWindow.tabs[0].id,
@@ -214,6 +220,7 @@ const TS2 = {
     browser,
     // DEFAULT_OPTIONS,
     OPENED_POPUP,
+    getOverlappingMonitor,
     console // Xpose the console here to share it with the popup
 };
 

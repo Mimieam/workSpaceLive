@@ -40,3 +40,8 @@ export const sideBarState = atom({
   key: 'sideBarState',
   default: false,
 });
+
+export const popupWindowState = atom({
+  key: 'popupWindow',
+  default: [],
+})

@@ -3,6 +3,7 @@
       ["@babel/preset-env", {
         "modules": false,
         "useBuiltIns": "usage",
+        "sourceMaps": "inline",
         "targets": {
             "esmodules": true
         }

@@ -8,7 +8,7 @@ import Tab, { Tab_} from './Tab'
 import useGlobal from './store';
 // import styled from '@emotion/styled';
 import SlideOver from './SlideOver'
-import { tabState, initialTabState, isSearchingState , sideBarState} from '../store/atoms'
+import { tabState, initialTabState, isSearchingState , sideBarState, popupWindowState} from '../store/atoms'
 
 // import '../../styles/main.css'
 import { ChromeRPC } from "../libs/utils";
@@ -17,16 +17,20 @@ import { port, useChromeMessagePassing } from '../libs/onMessageHook'
 import {SearchBar} from './Search'
 import {ErrorHook} from './Error'
 
-let reload = 0
+let POPUP_INFO = []
+// let reload = 0
 export default function App() {
-  reload += 1
+  // reload += 1
   const [state, setState] = useState([]);
   
   const [error, setError] = useState(null);
 
+  const [popupWindow, setPopupWindow] = useRecoilState(popupWindowState);
   const [fetchedTabs, setFetchedTabs] = useRecoilState(initialTabState);
   const [isSearching, setIsSearching] = useRecoilState(isSearchingState);
   const [isSideBarOpen, setIsSideBarOpen] = useRecoilState(sideBarState);
+
+  POPUP_INFO = popupWindow
 /*
 BUG: https://github.com/facebookexperimental/Recoil/issues/496
 https://github.com/facebookexperimental/Recoil/issues/307
@@ -37,16 +41,9 @@ until that's solved, we can either pass the state to the child components or use
 
   const triggerError = (msg) =>{
     setError(msg)
-
-
-    return
   }
 
-  console.log('App - reloaded?? - ' , reload, state)
-
-
-
-  useChromeMessagePassing(setState, setFetchedTabs)
+  useChromeMessagePassing(setState, setFetchedTabs, setPopupWindow)
 
   useEffect(() => {
     // console.log('Use effect-?')
@@ -54,14 +51,11 @@ until that's solved, we can either pass the state to the child components or use
       const windows = await browser.windows.getAll({ populate: true })
       const tabs = windows.map(w => w.tabs)
       setFetchedTabs(tabs)
-      console.log("fetchedTabs 0", fetchedTabs)
       await setState([...tabs, []])
       // setRState(tabs)
     }
-    console.log("fetchedTabs 1", fetchedTabs)
 
     fetchCurrentWindows();
-    console.log("fetchedTabs 2", fetchedTabs)
     return () => { }
   }, []);
 
@@ -77,8 +71,6 @@ until that's solved, we can either pass the state to the child components or use
 
     } else {
       console.log('CANT move tab while searching... indexes aren\'t the same...', { MOVE_TAB: `${ sourceTabId }, ${ sourceTabIndex }, ${ destinationWindowId }, ${ destinationTabIndex }` })
-      // const sourceTabId = state[sInd][source.index]?.id
-      // const destinationWindowId = state[dInd]? state[dInd][0]?.windowId: ''
       const trueSourceTabIndex = state[sInd][sourceTabIndex]?.index
       const trueDestinationTabIndex = state[dInd][destinationTabIndex]?.index
 
@@ -86,12 +78,6 @@ until that's solved, we can either pass the state to the child components or use
       triggerError("Can't currently move tabs while also searching.")
       // port.postMessage({ MOVE_TAB: `${ sourceTabId }, ${ trueSourceTabIndex }, ${ destinationWindowId }, ${ trueDestinationTabIndex }`})
     }
-    // ChromeRPC.sendMessage({ MOVE_TAB: `${ sourceTabId }, ${ sourceTabIndex }, ${ destinationWindowId }, ${ destinationTabIndex }` },
-    //   (data) => {
-    //     console.log(data)
-    //   }
-    // )
-    // console.log(sourceTabId, sourceTabIndex, destinationWindowId, destinationTabIndex)
   }
 
 
@@ -206,8 +192,15 @@ until that's solved, we can either pass the state to the child components or use
   );
 }
 
-
-document.addEventListener("mouseover", ()=>{
-  // port.postMessage({ BRING_FORWARD: `${ windowId },${ tabIndex}`})
-  console.log("mouseover")
-})
+// // TODO: make this configurable - activeFocus
+// document.addEventListener("mouseover", async () => {
+//   // const w = await browser.windows.getCurrent()
+//   // console.log('current w =', w)
+//   console.log("POPUP_INFO - moouveOver=", POPUP_INFO)
+//   const popupWindowId = POPUP_INFO?.popupWindowId 
+//   if (popupWindowId) {
+//     port.postMessage({ BRING_FORWARD: `${ popupWindowId },${ 0 }`})
+//   }
+//   console.log("mouseover")
+// })
+  

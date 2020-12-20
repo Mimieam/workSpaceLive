@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
 import './sidebar.css'
 
+
+// Object.entries(WS_MANAGER.all).map(([name, space])=> {return space.name})
+
 const SidebarButton = props => {
   const { className } = props
   let _className = className ? className : ''

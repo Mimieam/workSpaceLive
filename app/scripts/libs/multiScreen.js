@@ -33,23 +33,31 @@ export const  area = (r1t, r1b, r2t, r2b) => {
   return w*h
 }
 
-export const  getOverlappingMonitor = async () => {
-  // find in which monitor the current window is 'more' in
-  let displayMonitors = await promisify(chrome.system.display.getInfo)()
-  const currWindow = await promisify(chrome.windows.getCurrent)()
-  const windowVp = new Viewport(currWindow)
+// https://github.com/mozilla/webextension-polyfill/issues/158
+export const getOverlappingMonitor = async () => {
+  
+  if (chrome && chrome.system) {
+    // find in which monitor the current window is 'more' in
+    let displayMonitors = await promisify(chrome.system.display.getInfo)()
+    const currWindow = await promisify(chrome.windows.getCurrent)()
+    const windowVp = new Viewport(currWindow)
+    
+    displayMonitors = displayMonitors.map(m => {
+      return {
+        id: m.id,
+        isPrimary: m.isPrimary,
+        ...m.bounds,
+        overlapArea: getOverlapingArea(windowVp, new Viewport(m.bounds))
+      }
+    })
 
-  displayMonitors = displayMonitors.map(m => {
-    return {
-      id: m.id,
-      isPrimary: m.isPrimary,
-      ...m.bounds,
-      overlapArea: getOverlapingArea(windowVp, new Viewport(m.bounds))
-    }
-  })
+    let monitor = displayMonitors.reduce((prev, current) => (prev.overlapArea > current.overlapArea) ? prev : current)
+    return monitor
+    
+  } else {
+    return await browser.windows.getCurrent()
+  }
 
-  let monitor = displayMonitors.reduce((prev, current) => (prev.overlapArea > current.overlapArea) ? prev : current)
-  return monitor
 }
 
 export const getWindowDim = () => {
