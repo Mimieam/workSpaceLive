@@ -2,7 +2,7 @@
 import {
   promisify,
   pivotThis,
-} from './utils'
+} from '../libs/utils'
 
 
 const getWindow = promisify(chrome.windows.get)

@@ -7,6 +7,8 @@ import './libs/contextMenu'
 import './libs/bgEvents'
 import { ChromeRPC } from './libs/utils';
 
+import { stackFn } from './functionalities/stackFn'
+
 let DEBUG = true
 let OPENED_POPUP = []
 let __clipboardContent = ''
@@ -218,6 +220,7 @@ browser.webRequest?.onBeforeRequest.addListener((req) => {
 
 const TS2 = {
     browser,
+    stackFn,
     // DEFAULT_OPTIONS,
     OPENED_POPUP,
     getOverlappingMonitor,
