@@ -192,15 +192,15 @@ until that's solved, we can either pass the state to the child components or use
   );
 }
 
-// // TODO: make this configurable - activeFocus
-// document.addEventListener("mouseover", async () => {
-//   // const w = await browser.windows.getCurrent()
-//   // console.log('current w =', w)
-//   console.log("POPUP_INFO - moouveOver=", POPUP_INFO)
-//   const popupWindowId = POPUP_INFO?.popupWindowId 
-//   if (popupWindowId) {
-//     port.postMessage({ BRING_FORWARD: `${ popupWindowId },${ 0 }`})
-//   }
-//   console.log("mouseover")
-// })
+// TODO: make this configurable - activeFocus
+document.addEventListener("mouseover", async () => {
+  // const w = await browser.windows.getCurrent()
+  // console.log('current w =', w)
+  console.log("POPUP_INFO - moouveOver=", POPUP_INFO)
+  const popupWindowId = POPUP_INFO?.popupWindowId 
+  if (popupWindowId) {
+    port.postMessage({ BRING_FORWARD: `${ popupWindowId },${ 0 }`})
+  }
+  console.log("mouseover")
+})
   
