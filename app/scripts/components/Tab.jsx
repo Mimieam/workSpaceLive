@@ -8,7 +8,7 @@ import useGlobal from './store';
 import './tab.css'
 import { ButtonStrip } from "./ButtonStrip";
 
-export const FavIcon = ({ url }) => {
+export const FavIcon = ({url}) => {
   const _style = {
     // background: `url(${ url }) no-repeat center`,
     // add this if u gonna use the chrome cache.. but it will give u low quality  "content_security_policy": "img-src chrome://favicon;"
@@ -26,7 +26,7 @@ export const FavIcon = ({ url }) => {
   return <div style={ _style }> </div>
 }
 
-export const Tab_ = ({ item, index, ind }) => {
+export const Tab_ = ({ item, index, ind, favIconUrl }) => {
 
   const [globalState, globalActions] = useGlobal();
   const _style_wrapper = {
@@ -45,10 +45,12 @@ export const Tab_ = ({ item, index, ind }) => {
     marginLeft: "auto" ,
   }
 
+  // const _favUrl = item.favIconUrl
+  // console.log(_favUrl)
         // { item.title }
   return (
     <div style={ _style_wrapper }>
-      <FavIcon url={ item.favIconUrl } />
+      <FavIcon url={ favIconUrl } />
       {/* <FavIcon url={ item.url } /> */}
       <div style={ _style_title }>
         { `${item.id}|${item.index}`} { item.title }
@@ -67,7 +69,8 @@ export const Tab_ = ({ item, index, ind }) => {
 }
 
 
-export const Tab = ({ item, index, ind }) => {
+export const Tab = ({ item, index, ind, favIconUrl }) => {
+  console.log(item, favIconUrl)
     return (
       <Draggable key={ item.id } draggableId={ `${ item.id }` } index={ index }>
         { (provided, snapshot) => {
@@ -84,6 +87,7 @@ export const Tab = ({ item, index, ind }) => {
             item={ item }
             index={ index }
             ind={ ind }
+            favIconUrl={ favIconUrl }
           />
         </div>
       )} }

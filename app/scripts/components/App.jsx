@@ -15,7 +15,8 @@ import { ChromeRPC } from "../libs/utils";
 import { port, useChromeMessagePassing } from '../libs/onMessageHook'
 
 import {SearchBar} from './Search'
-import {ErrorHook} from './Error'
+import { ErrorHook } from './Error'
+import { TitleStrip } from './TitleStrip'
 
 let POPUP_INFO = []
 // let reload = 0
@@ -143,7 +144,7 @@ until that's solved, we can either pass the state to the child components or use
       <div className="appHeader pt-2 pb-2 rounded-b bg-gray-900">
         <div className="appTitle font-light text-base pl-4 pt-2"
           onClick={ () => setIsSideBarOpen(!isSideBarOpen) }
-        > { `WorkSpace{Live}` } </div>
+        > <TitleStrip/> </div>
         <SearchBar
           state={state}
           setState={setState}
@@ -166,11 +167,12 @@ until that's solved, we can either pass the state to the child components or use
                 >
                   { el.map((item, index) => (
                     <Tab
-                    key={ item.id }
-                    item={ item }
-                    index={ index }
-                    provided={provided }
-                    snapshot={ snapshot}
+                      key={ item.id }
+                      item={ item }
+                      index={ index }
+                      favIconUrl={ item.favIconUrl }
+                      provided={provided }
+                      snapshot={ snapshot}
                     />
                     )) }
                     { provided.placeholder }
