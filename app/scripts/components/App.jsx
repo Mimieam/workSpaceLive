@@ -143,7 +143,7 @@ until that's solved, we can either pass the state to the child components or use
       
       <div className="appHeader pt-2 pb-2 rounded-b bg-gray-900">
         <div className="appTitle font-light text-base pl-4 pt-2"
-          onClick={ () => setIsSideBarOpen(!isSideBarOpen) }
+          // onClick={ () => setIsSideBarOpen(!isSideBarOpen) }
         > <TitleStrip/> </div>
         <SearchBar
           state={state}

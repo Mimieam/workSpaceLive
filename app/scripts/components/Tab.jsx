@@ -57,13 +57,6 @@ export const Tab_ = ({ item, index, ind, favIconUrl }) => {
       </div>
 
       <ButtonStrip item={item}/>
-      {/* <button
-        style={_style_buttons}
-        type="button"
-        onClick={ () => globalActions.addToCounter(1) }
-      >
-        +1 to global
-      </button> */}
     </div>
   )
 }
