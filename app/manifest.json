@@ -19,12 +19,9 @@
     "clipboardWrite",
     "clipboardRead",
     "storage",
-    "chrome://favicon/",
     "contextMenus",
     "system.display",
-    "tabGroups",
 
-    "webview",
     "http://*/*",
     "https://*/*"
   ],
