@@ -1,0 +1,37 @@
+{
+    "$schema": "https://json.schemastore.org/swcrc",
+    "jsc": {
+        "parser": {
+            "syntax": "ecmascript",
+            "jsx": true,
+            "dynamicImport": true,
+            "privateMethod": false,
+            "functionBind": false,
+            "exportDefaultFrom": false,
+            "exportNamespaceFrom": false,
+            "decorators": false,
+            "decoratorsBeforeExport": false,
+            "topLevelAwait": true,
+            "importMeta": false
+        },
+        // "transform": null,
+        "target": "esnext",
+        "loose": true,
+        "externalHelpers": false,
+        // Requires v1.2.50 or upper and requires target to be es2016 or upper.
+        "keepClassNames": false
+    },
+    // "module": {
+    //     "type": "commonjs",
+
+    //     // These are defaults.
+    //     "strict": false,
+    //     "strictMode": true,
+    //     "lazy": false,
+    //     "noInterop": false
+    //   },
+    "sourceMaps": true,
+    // "inlineSourcesContent": true,
+    // "isModule": true,
+    "minify": false
+   }
