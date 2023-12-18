@@ -1,7 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 /* @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities"; */
@@ -120,11 +119,12 @@ html::-webkit-scrollbar {
 }
 
 .tab {
-  user-select: "none";
+  user-select: none;
   padding: 4px;
   margin: 0 0 1px 0;
-  font: 1em;
+  font-size: 1em;
   background:var(--accent-color);
+  line-height: normal;
   border-radius: 2px;
 }
 .tab div {

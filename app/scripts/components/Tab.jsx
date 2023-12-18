@@ -4,7 +4,7 @@ import browser from 'webextension-polyfill';
 import { getItems, reorder, getItemStyle,getListStyle ,move } from './helpers'
 
 
-import useGlobal from './store';
+// import useGlobal from './store';
 import './tab.css'
 import { ButtonStrip } from "./ButtonStrip";
 
@@ -28,7 +28,7 @@ export const FavIcon = ({url}) => {
 
 export const Tab_ = ({ item, index, ind, favIconUrl }) => {
 
-  const [globalState, globalActions] = useGlobal();
+//   const [globalState, globalActions] = useGlobal();
   const _style_wrapper = {
     display: "flex",
     fontSize: "13px",
@@ -53,7 +53,8 @@ export const Tab_ = ({ item, index, ind, favIconUrl }) => {
       <FavIcon url={ favIconUrl } />
       {/* <FavIcon url={ item.url } /> */}
       <div style={ _style_title }>
-        { `${item.id}|${item.index}`} { item.title }
+        {/* { `${item.id}|${item.index}`} { item.title } */}
+        { item.title }
       </div>
 
       <ButtonStrip item={item}/>

@@ -4,7 +4,7 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-    
+
     {
       "type": "chrome",
       "request": "launch",
@@ -18,7 +18,7 @@
         "--target chromium"
         // "--remote-debugging-port=9222"
       ],
-      "breakOnLoad": true,
+    //   "breakOnLoad": true,
     "sourceMapPathOverrides": {
       "../*": "${webRoot}/*"
     }

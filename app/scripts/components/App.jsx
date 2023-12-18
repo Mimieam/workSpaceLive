@@ -5,7 +5,7 @@ import { useRecoilState , useSetRecoilState, useRecoilValue} from 'recoil'
 
 import { getItems, reorder, getItemStyle,getListStyle ,move } from './helpers'
 import Tab, { Tab_} from './Tab'
-import useGlobal from './store';
+// import useGlobal from './store';
 // import styled from '@emotion/styled';
 import SlideOver from './SlideOver'
 import { tabState, initialTabState, isSearchingState , sideBarState, popupWindowState} from '../store/atoms'
@@ -23,7 +23,7 @@ let POPUP_INFO = []
 export default function App() {
   // reload += 1
   const [state, setState] = useState([]);
-  
+
   const [error, setError] = useState(null);
 
   const [popupWindow, setPopupWindow] = useRecoilState(popupWindowState);
@@ -133,14 +133,14 @@ until that's solved, we can either pass the state to the child components or use
   }
 
   return (
-    <div className={"appWrapper"}>
+    <div className="appWrapper">
       {
         <SlideOver
         isOpen={ isSideBarOpen }
         dismiss={ () => setIsSideBarOpen(false) }
         />
       }
-      
+
       <div className="appHeader pt-2 pb-2 rounded-b bg-gray-900">
         <div className="appTitle font-light text-base pl-4 pt-2"
           // onClick={ () => setIsSideBarOpen(!isSideBarOpen) }
@@ -199,10 +199,9 @@ document.addEventListener("mouseover", async () => {
   // const w = await browser.windows.getCurrent()
   // console.log('current w =', w)
   console.log("POPUP_INFO - moouveOver=", POPUP_INFO)
-  const popupWindowId = POPUP_INFO?.popupWindowId 
+  const popupWindowId = POPUP_INFO?.popupWindowId
   if (popupWindowId) {
     port.postMessage({ BRING_FORWARD: `${ popupWindowId },${ 0 }`})
   }
   console.log("mouseover")
 })
-  

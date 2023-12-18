@@ -5,9 +5,7 @@ import { handleMessagePassing } from './libs/onMessageHook';
 
 import './libs/contextMenu'
 import './libs/bgEvents'
-import { ChromeRPC } from './libs/utils';
 
-import { stackFn } from './functionalities/stackFn'
 
 let DEBUG = true
 let OPENED_POPUP = []
@@ -23,12 +21,7 @@ browser.runtime.onConnect.addListener((port) => {
         console.log(request)
         if (request.GET_POPUP_INFO) {
             console.log("GET_POPUP_INFO:  ", request.GET_POPUP_INFO, console.log(OPENED_POPUP))
-            // sendResponse({ POPUP_INFO_RES: "Received the POPUP_INFO" });
-            console.log(port)
-            // port.sendMessage({ POPUP_INFO: JSON.stringify(...OPENED_POPUP) })
             await portFromPOPUP.postMessage({ POPUP_INFO: JSON.stringify(...OPENED_POPUP) })
-            // portFromPOPUP?.postMessage({ POPUP_INFO: JSON.stringify(...OPENED_POPUP) })
-            // POPUP_INFO = await JSON.parse(request.POPUP_INFO)
           }
 
           // requests to background <==
@@ -59,7 +52,7 @@ browser.runtime.onConnect.addListener((port) => {
             // console.log(`lastID = ${lastID}`)
             // console.log(`OPENED_POPUP =`, OPENED_POPUP)
             const { popupWindowId, parentId } = OPENED_POPUP[0]
-            
+
             await browser.windows.update(popupWindowId, {focused: true})
             await browser.tabs.highlight({ windowId: popupWindowId, tabs: 0 })
             // console.log(`popupWindowId = ${popupWindowId}`)
@@ -116,7 +109,7 @@ browser.browserAction.onClicked.addListener(async() => {
             'type': 'popup',
             ...appConfig
         }).then(async (appWindow) => {
-            
+
             console.log('POP UP CREATED', appWindow.id, appWindow);
             await browser.windows.update(parentWindow.id, { ...parentConfig })
             // await browser.windows.update(parentWindow.id, { ...parentConfig }, (pW) => console.log(pW));
@@ -220,7 +213,7 @@ browser.webRequest?.onBeforeRequest.addListener((req) => {
 
 const TS2 = {
     browser,
-    stackFn,
+    // stackFn,
     // DEFAULT_OPTIONS,
     OPENED_POPUP,
     getOverlappingMonitor,

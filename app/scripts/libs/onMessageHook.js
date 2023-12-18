@@ -47,13 +47,13 @@ export const handleMessagePassing = (setState, setFetchedTabs, setPopupWindow) =
           await setPopupWindow(POPUP_INFO)
         }
       }
-    );  
+    );
 }
 
 
 
 
-// "sometime a man can be smart enought to be really stupid" ~ somebook
+// "sometime a man can be smart enough to be really stupid" ~ somebook
 
 export function useChromeMessagePassing(setState, setFetchedTabs, setPopupWindow) {
   useEffect(() => {

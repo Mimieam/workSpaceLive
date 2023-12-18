@@ -13,7 +13,7 @@ const SidebarButton = props => {
       { props.value }
     </div>
   )
-  
+
 }
 
 
@@ -21,7 +21,7 @@ export default class Sidebar extends Component {
 
   render() {
 
-    const workspaces = [1,2,3,4,5] 
+    const workspaces = [1,2,3,4,5]
     const listOfWorkSpaceComponents = workspaces.map((value, i) => <SidebarButton key={i}  value={value} />);
 
 
