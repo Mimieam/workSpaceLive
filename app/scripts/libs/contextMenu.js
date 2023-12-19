@@ -1,7 +1,7 @@
 // thanks to https://stackoverflow.com/a/50936590/623546
 /**
  * Dynamic ws context menu
- * 
+ *
  */
 
 import WS_MANAGER, { ws, formatId, formatName } from './neoWorkSpace'
@@ -10,7 +10,7 @@ import { randomId, interleave } from './helpers'
 import { ChromeRPC, generateRandomColor } from "./utils";
 // import './startUp'
 
-window.WS_MANAGER = WS_MANAGER
+globalThis.WS_MANAGER = WS_MANAGER
 let CURRENT_WINDOW_ID = null
 
 const browserEventListener = async (skip = false) => {
@@ -47,7 +47,7 @@ chrome.runtime.onStartup.addListener(async() => {
 // });
 
 
-const genCtxMenuEntry = ({ _ws = {}, ctx = null, parentId = null, act = true, withSubmenu = false, id = null, title = null, type = 'normal' }) => {
+const genCtxMenuEntry = ({ _ws = {}, ctx = null, parentId = null, act = true, withSubmenu = false, id = randomId(), title = null, type = 'normal' }) => {
 
   const _id = formatId(_ws?.name || id)
   const _name = formatName(_ws?.name || title)
@@ -68,7 +68,7 @@ const genCtxMenuEntry = ({ _ws = {}, ctx = null, parentId = null, act = true, wi
 
 const create_empty_workspace_handler = () => {
   let aNewWorkSpace = {}
-  const wsName = window.prompt("Please Enter a Name for your new WorkSpace")
+  const wsName = prompt("Please Enter a Name for your new WorkSpace")
   let menuComponent = genCtxMenuEntry({ _ws: ws.fromWindows([{ tabs: [] }], wsName, WS_MANAGER), ctx: null, parentId: null, withSubmenu: true })
   dynamicRootMenuWorkSpace.push(menuComponent)
   CTX_MENU.updateMenu()
@@ -78,12 +78,12 @@ const create_empty_workspace_handler = () => {
 
 const create_workspace_handler = async (info, tab, current=true) => {
 
-  const wsName = window.prompt("Please Enter a Name for your new WorkSpace");
+  const wsName = prompt("Please Enter a Name for your new WorkSpace");
   let aNewWorkSpace = {}
-  
+
   if (current) {
     console.log("creating WS from current window", CURRENT_WINDOW_ID )
-    const win = await browser.windows.get(CURRENT_WINDOW_ID , { populate: true })  
+    const win = await browser.windows.get(CURRENT_WINDOW_ID , { populate: true })
     console.log(win)
     aNewWorkSpace = ws.fromWindows([win], wsName)
   } else {
@@ -104,10 +104,10 @@ const create_workspace_handler = async (info, tab, current=true) => {
 const delete_workspace_handler = async (_id) => {
   console.log(`${ _id } Clicked`)
 
-  const yesOrNo = window.prompt(`Are you Sure you want to DELETE "${_id}"? \nYes/No`).trim().toLowerCase()
+  const yesOrNo = prompt(`Are you Sure you want to DELETE "${_id}"? \nYes/No`).trim().toLowerCase()
 
   if (yesOrNo == 'yes') {
-    
+
     await WS_MANAGER.remove(_id)
     await CTX_MENU.deleteMenu(_id)
     dynamicRootMenuWorkSpace = dynamicRootMenuWorkSpace.filter(m => m.id != _id)
@@ -169,7 +169,7 @@ const generateWSDeleteList = () => {
     }
   }).sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0))
   return res
-} 
+}
 
 // menu element need to have Unique IDs
 const generateUniqueSubMenu = (m, parentName) => {
@@ -178,8 +178,10 @@ const generateUniqueSubMenu = (m, parentName) => {
   const arr3 = interleave(arr1, arr2).flat().map(x => {
     if (x == '|') {
       return [{
+        id: randomId(),
         type: "separator"
       }, {
+        id: randomId(),
         type: "separator"
       }]
     }
@@ -229,7 +231,7 @@ const ROOTMENU = [
   { id: 'delete_workspace', title: 'Delete WorkSpace', menu: DELETEMENU},
   // { id: 'delete_workspace', title: 'Delete WorkSpace', act: delete_workspace_handler },
   { id: 'option', title: 'Options', menu: OPTIONMENU },
-  { type: 'separator' },
+  { id: randomId(), type: 'separator' },
 ];
 
 const reloadSavedWS = () => {
@@ -254,7 +256,7 @@ let dynamicRootMenuWorkSpace = [
 ].sort(
   (a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0)
 )
-window.dynamicRootMenuWorkSpace = dynamicRootMenuWorkSpace
+globalThis.dynamicRootMenuWorkSpace = dynamicRootMenuWorkSpace
 
 export class ctxMenu {
 
@@ -283,13 +285,18 @@ export class ctxMenu {
   }
 
   setOnClickHandler() {
-    chrome.contextMenus.onClicked.addListener((info, tab) => {
-      ctxMenu.listeners[info.menuItemId](info, tab);
-    });
+    try {
+
+        chrome.contextMenus.onClicked.addListener((info, tab) => {
+          ctxMenu.listeners[info.menuItemId](info, tab);
+        });
+    } catch (error) {
+        console.warn(error);
+    }
   }
 
   removeOnClickHandler() {
-    chrome.contextMenus.onClicked = null
+    // chrome.contextMenus.onClicked = null
   }
 
   createMenu(menu, root = null) {
@@ -308,6 +315,7 @@ export class ctxMenu {
       chrome.contextMenus.create(
         // ⦾
         (type == "separator") ? {
+         id: id,
           type: "separator",
           parentId: root,
         } :
@@ -332,7 +340,7 @@ export class ctxMenu {
     this._reset() // remove all so there is no ID issues
 
     const _menu = [...ROOTMENU,...dynamicRootMenuWorkSpace.sort((a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0))]  // add all available menu
-    _menu.find(x=>x.id=="delete_workspace").menu = [...generateWSDeleteList()] 
+    _menu.find(x=>x.id=="delete_workspace").menu = [...generateWSDeleteList()]
     this.createMenu(_menu)
   }
 

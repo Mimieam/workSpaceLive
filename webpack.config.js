@@ -47,7 +47,7 @@ const config = (env) => {
             maxAssetSize: 100000, // in bytes
         },
         mode: mode,
-        devtool: false,
+        devtool: "source-map",
         // watch: true,
         watchOptions: {
           ignored: "/node_modules/",

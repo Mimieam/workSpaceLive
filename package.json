@@ -1,5 +1,5 @@
 {
-	"name": "WLS",
+	"name": "oakley",
 	"version": "2.0.0",
 	"description": "No nonsense browser tab manager",
 	"scripts": {
@@ -15,7 +15,7 @@
 		"start": "npm run serve & npm run start:chrome",
 		"_compress": "node custom_build_scripts/package.js"
 	},
-	"author": "Miezan Echimane",
+	"author": "Miezan",
 	"license": "MIT",
 	"dependencies": {
 		"@fortawesome/fontawesome-free": "^5.15.1",

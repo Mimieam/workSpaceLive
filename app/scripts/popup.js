@@ -14,17 +14,8 @@ import './../styles/main.css'
 // import { h, app } from "hyperapp"
 // import { observable, autorun } from "mobx"
 
-if (browser && browser.extension) {
-
-  let backgroundJS = browser.extension.getBackgroundPage();
-  let DEBUG = true;
-  DEBUG && console.log("browser", browser.extension)
-  DEBUG && console.log("Background JS - loaded ?", backgroundJS)
-  DEBUG && console.log("Background JS - TS2 ?", backgroundJS.ts2)
-  console = backgroundJS.console
-
-  console.log("loaded");
-}
+// if (browser && browser.extension) {
+// }
 
 const container = document.getElementById('app');
 const root = createRoot(container);

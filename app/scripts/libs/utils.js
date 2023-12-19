@@ -236,4 +236,3 @@ export const loadFromStorage = async (itemStr) => {
     console.log(`\u2192\u21F4 ${itemStr}`, store);
   })
 }
-

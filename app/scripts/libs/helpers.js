@@ -1,4 +1,4 @@
-import { saveAs } from 'file-saver'
+// import { saveAs } from 'file-saver'
 
 /**
  * close any empty tabs
@@ -28,7 +28,7 @@ export const closeEmptyTabs = (tabs) => {
 };
 
 const findAndCloseDuplicateTabs = (_tabs = null) => {
-    
+
     let tabs = _tabs.map(t => {return {...t ,...{url: t.url||t.pendingUrl}}})
     if (!tabs) { return }
 
@@ -50,7 +50,7 @@ const findAndCloseDuplicateTabs = (_tabs = null) => {
 };
 
 const discardThisTab = (tabId) => {
-    new Promise((resolve) => { 
+    new Promise((resolve) => {
         chrome.tabs.onUpdated.addListener(async function listener(tabId, info) {
             if (info.status === 'complete' && tabId === tab.id) {
                 await chrome.tabs.discard(tab.id, (discaredTab) => {
@@ -66,7 +66,7 @@ const discardThisTab = (tabId) => {
 
 export const openTab = async ({ urls = [], wID = null, meta = {}}) => {
     // const t = await browser.tabs.create({ url:_url, windowId: windowId })
-    let t 
+    let t
     if (wID) {
         t = new Promise((resolve) => {
             chrome.tabs.create({ url:urls, windowId: wID , ...meta}, async(tab) => {
@@ -85,9 +85,9 @@ export const openTab = async ({ urls = [], wID = null, meta = {}}) => {
     return t;
 }
 
-// thanks to https://levelup.gitconnected.com/generate-unique-id-in-the-browser-without-a-library-50618cdc3cb1 :) 
+// thanks to https://levelup.gitconnected.com/generate-unique-id-in-the-browser-without-a-library-50618cdc3cb1 :)
 export function randomId(){
-    const uint32 = window.crypto.getRandomValues(new Uint32Array(1))[0];
+    const uint32 = globalThis.crypto.getRandomValues(new Uint32Array(1))[0];
     return uint32.toString(16);
 }
 

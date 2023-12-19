@@ -1,18 +1,3 @@
-/**
- *  To setup a context menu,
- *
- * add the follwing to background/index.js
-
-  import { contextMenuObject, onClickContextMenuHandler } from "./contextMenu";
-
-  chrome.runtime.onInstalled.addListener(() => {
-   chrome.contextMenus.create(contextMenuObject);
-  })
-
-  chrome.contextMenus.onClicked.addListener(onClickContextMenuHandler);
- */
-
-
 
 let windowId = 0;
 const CONTEXT_MENU_ID = 'ts2_context_menu';

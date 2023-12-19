@@ -1,16 +1,17 @@
 import LZString from 'Lz-string'
+import {localStorage} from './storage'
 import { openTab, currentDate } from './helpers'
 
 /**
  * windowsArr = await ts2.browser.windows.getAll({populate:true})
  * _ws = ws.fromWindows(windowsArr)
- * 
+ *
  * ws(name, windows=[{meta: {}, urls=[]}, {meta: {}, urls=[]}])
  * ws.fromUrls(name, urls)
  * ws.fromWindows(name)
  * */
 
-window.LZString = LZString
+globalThis.LZString = LZString
 export class ws {
   static totalWSCount = 0
 
@@ -221,7 +222,7 @@ export class wsManager {
   }
 
   update(_id, tabs) {
-    
+
   }
 
   remove(nameOrId) {
@@ -235,7 +236,7 @@ export class wsManager {
   }
 
   reHydrate({ name = "", windows = [], winCount = 0, tabCount = 0 }) {
-    return new ws(name, windows, false, wsManager = this)
+    return new ws(name, windows, false, this)
   }
 
   get(nameOrId) {
@@ -258,25 +259,27 @@ export class wsManager {
     const _all_ws_str = JSON.stringify(toBeSaved)
     localStorage.setItem(this.name, _all_ws_str);
     console.log("Saved wsManager =>", _all_ws_str)
-    
+
     return _all_ws_str
   }
 
   load() {
-    this.noSave = true
-    const _all_ws_str = localStorage.getItem(this.name)
+    (async ()=>{
+        this.noSave = true
+        const _all_ws_str = await localStorage.getItem(this.name)
 
-    if (_all_ws_str ){
-      const saved = JSON.parse(_all_ws_str)
-      // console.log(saved)
+        if (_all_ws_str ){
+          const saved = JSON.parse(_all_ws_str)
+          // console.log(saved)
 
-      for (const [wsId, wsObj] of Object.entries(saved)) {
-        // console.log(wsId, wsObj)
-        this.reHydrate(wsObj)
-      }
-      console.log("reLoading wsManager =>", this.all)
-    }
-    this.noSave = false
+          for (const [wsId, wsObj] of Object.entries(saved)) {
+            // console.log(wsId, wsObj)
+            this.reHydrate(wsObj)
+          }
+          console.log("reLoading wsManager =>", this.all)
+        }
+        this.noSave = false
+    })()
   }
 
   export() {

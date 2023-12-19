@@ -1,7 +1,8 @@
 import browser from 'webextension-polyfill';
 
-import { getOverlappingMonitor } from './libs/multiScreen';
-import { handleMessagePassing } from './libs/onMessageHook';
+
+// import { getOverlappingMonitor } from './libs/multiScreen';
+// import { handleMessagePassing } from './libs/onMessageHook';
 
 import './libs/contextMenu'
 import './libs/bgEvents'
@@ -67,11 +68,15 @@ browser.runtime.onConnect.addListener((port) => {
     })
 })
 
-handleMessagePassing()
+// handleMessagePassing()
 
-browser.browserAction.onClicked.addListener(async() => {
+chrome.action.onClicked.addListener(async() => {
     console.log('OPENING FROM BACKGROUND');
-    const currentMonitor = await getOverlappingMonitor()
+    // const currentMonitor = await getOverlappingMonitor()
+        // SW doesn't have window so we need the screen using this... - might need to test with multiple Screen..
+    const [{workArea}] = await browser.system.display.getInfo()
+    const currentMonitor = workArea;
+
     console.log(currentMonitor)
     const parentWindow = await browser.windows.getCurrent();
 
@@ -138,14 +143,14 @@ chrome.windows.onRemoved.addListener((id) => {
 
 
 /*
- * Chrome.browserAction.setBadgeText({ text: `${displayText}` })
- * chrome.browserAction.setBadgeBackgroundColor({ color: newColor });
+ * Chrome.action.setBadgeText({ text: `${displayText}` })
+ * chrome.action.setBadgeBackgroundColor({ color: newColor });
  */
 
-document.addEventListener('copy', (e) => {
-    e.clipboardData.setData('text/plain', __clipboardContent);
-    e.preventDefault();
-});
+// document.addEventListener('copy', (e) => {
+//     e.clipboardData.setData('text/plain', __clipboardContent);
+//     e.preventDefault();
+// });
 
 const copyUrlsToClipboard = () => {
 
@@ -165,27 +170,27 @@ const openUrls = async (_urls, windowId) => {
     return openTabs
 }
 
-browser.commands.onCommand.addListener(async (command) => {
-    const w = await browser.windows.getCurrent({ populate: true });
+// browser.commands.onCommand.addListener(async (command) => {
+//     const w = await browser.windows.getCurrent({ populate: true });
 
-    switch (command) {
-        case 'copy_all_url':
-            const text = w.tabs.flatMap(t => t.url).filter(x => x).join(',\n')
-            __clipboardContent = text
-            document.execCommand('copy')
-            console.log('Command:', command);
-            console.log(__clipboardContent)
-            break;
-        case 'open_copied_url':
-            const url = __clipboardContent.split(',\n')
-            console.log(url)
-            const res = openUrls(url, w.id)
-            console.log(res)
-            break;
-        default:
-            break;
-    }
-});
+//     switch (command) {
+//         case 'copy_all_url':
+//             const text = w.tabs.flatMap(t => t.url).filter(x => x).join(',\n')
+//             __clipboardContent = text
+//             document.execCommand('copy')
+//             console.log('Command:', command);
+//             console.log(__clipboardContent)
+//             break;
+//         case 'open_copied_url':
+//             const url = __clipboardContent.split(',\n')
+//             console.log(url)
+//             const res = openUrls(url, w.id)
+//             console.log(res)
+//             break;
+//         default:
+//             break;
+//     }
+// });
 
 
 /**
@@ -216,9 +221,9 @@ const TS2 = {
     // stackFn,
     // DEFAULT_OPTIONS,
     OPENED_POPUP,
-    getOverlappingMonitor,
+    // getOverlappingMonitor,
     console // Xpose the console here to share it with the popup
 };
 
-window.ts2 = TS2;
+// window.ts2 = TS2;
 export default TS2;
