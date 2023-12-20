@@ -25,6 +25,7 @@ const config = (env) => {
             'popup.js': ['./app/scripts/popup.js'],
             'background.js': ['./app/scripts/background.js'],
             'options.js': './app/scripts/options.js',
+            'offscreen.js': './app/scripts/offscreen.js',
         },
         output: {
             clean: true,
@@ -119,6 +120,14 @@ const config = (env) => {
                 filename: 'popup.html',
                 inject: 'body',
                 chunks: ['vendors.js', 'popup.js'],
+                chunksSortMode: 'manual',
+                minify: isProd? true: false
+            }),
+            new HtmlWebpackPlugin({
+                template: path.join(__dirname, 'app', 'offscreen.html'),
+                filename: 'offscreen.html',
+                inject: 'body',
+                chunks: [, 'offscreen.js'],
                 chunksSortMode: 'manual',
                 minify: isProd? true: false
             }),

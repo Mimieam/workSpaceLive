@@ -8,9 +8,10 @@ import WS_MANAGER, { ws, formatId, formatName } from './neoWorkSpace'
 import browser from 'webextension-polyfill';
 import { randomId, interleave } from './helpers'
 import { ChromeRPC, generateRandomColor } from "./utils";
+import { offScreenPrompt, offScreenConfirm } from './offScreenUtils';
 // import './startUp'
 
-globalThis.WS_MANAGER = WS_MANAGER
+// globalThis.WS_MANAGER = WS_MANAGER
 let CURRENT_WINDOW_ID = null
 
 const browserEventListener = async (skip = false) => {
@@ -66,19 +67,27 @@ const genCtxMenuEntry = ({ _ws = {}, ctx = null, parentId = null, act = true, wi
   }
 }
 
-const create_empty_workspace_handler = () => {
+const create_empty_workspace_handler = async () => {
   let aNewWorkSpace = {}
-  const wsName = prompt("Please Enter a Name for your new WorkSpace")
+
+  // call offscreen
+    // service worker can't access prompt - so we use offscreenPrompt instead
+    const wsName = await offScreenPrompt('Please Enter a Name for your new WorkSpace')
+//   const wsName = prompt("Please Enter a Name for your new WorkSpace")
+
+
   let menuComponent = genCtxMenuEntry({ _ws: ws.fromWindows([{ tabs: [] }], wsName, WS_MANAGER), ctx: null, parentId: null, withSubmenu: true })
   dynamicRootMenuWorkSpace.push(menuComponent)
   CTX_MENU.updateMenu()
+  console.log({aNewWorkSpace, dynamicRootMenuWorkSpace})
   return aNewWorkSpace
 
 }
 
 const create_workspace_handler = async (info, tab, current=true) => {
 
-  const wsName = prompt("Please Enter a Name for your new WorkSpace");
+    // service worker can't access prompt - so we use offscreenPrompt instead
+    const wsName = await offScreenPrompt('Please Enter a Name for your new WorkSpace')
   let aNewWorkSpace = {}
 
   if (current) {
@@ -104,17 +113,17 @@ const create_workspace_handler = async (info, tab, current=true) => {
 const delete_workspace_handler = async (_id) => {
   console.log(`${ _id } Clicked`)
 
-  const yesOrNo = prompt(`Are you Sure you want to DELETE "${_id}"? \nYes/No`).trim().toLowerCase()
+//   const yesOrNo = prompt(`Are you Sure you want to DELETE "${_id}"? \nYes/No`).trim().toLowerCase()
+  const yes = await offScreenConfirm(`Are you Sure you want to DELETE "${_id}"?`)
 
-  if (yesOrNo == 'yes') {
-
+  if (yes) {
     await WS_MANAGER.remove(_id)
     await CTX_MENU.deleteMenu(_id)
     dynamicRootMenuWorkSpace = dynamicRootMenuWorkSpace.filter(m => m.id != _id)
     CTX_MENU.updateMenu()
     console.log('Deleting WS - ', _id)
   } else {
-    console.log(_id, 'Not Deleted - "Yes" Comfirmation Not Entered')
+    console.log(_id, 'Not Deleted - confirmation cancelled')
   }
 }
 
@@ -144,7 +153,7 @@ const WORKSPACEMENU = [
   {
     id: 'open_fn', title: 'Open', act: (info, tab) => {
       WS_MANAGER.all[info.parentMenuItemId].open()
-      console.log('context Menu-> open_fn', info, tab, info.menuItemId); alert('context Menu-> open_fn')
+      console.log('context Menu-> open_fn', info, tab, info.menuItemId);
     }
   }
   // {
@@ -236,6 +245,8 @@ const ROOTMENU = [
 
 const reloadSavedWS = () => {
   let res = []
+  console.log(structuredClone(WS_MANAGER))
+  console.log(`reloadSavedWS`, WS_MANAGER.all)
   for (const [wsId, wsObj] of Object.entries(WS_MANAGER.all)) {
     res.push(genCtxMenuEntry({ _ws: wsObj, ctx: null, parentId: null, withSubmenu: true }))
   }
@@ -287,8 +298,8 @@ export class ctxMenu {
   setOnClickHandler() {
     try {
 
-        chrome.contextMenus.onClicked.addListener((info, tab) => {
-          ctxMenu.listeners[info.menuItemId](info, tab);
+        chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+          await ctxMenu.listeners[info.menuItemId](info, tab);
         });
     } catch (error) {
         console.warn(error);
@@ -296,7 +307,7 @@ export class ctxMenu {
   }
 
   removeOnClickHandler() {
-    // chrome.contextMenus.onClicked = null
+    chrome.contextMenus.onClicked = null
   }
 
   createMenu(menu, root = null) {
