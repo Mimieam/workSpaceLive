@@ -193,37 +193,33 @@ const openUrls = async (_urls, windowId) => {
 // });
 
 
-/**
- *  requires  permissions: - disabling this for now
-*   "<all_urls>",
- *  "webRequest",
-    "webRequestBlocking",
- * */
-browser.webRequest?.onBeforeRequest.addListener((req) => {
-    OPENED_POPUP.some(x => {
-        console.log(x.popupTabId,  req.tabId, x.popupTabId == req.tabId)
-        return x.popupTabId == req.tabId
-    })
+// /**
+//  *  requires  permissions: - disabling this for now
+// *   "<all_urls>",
+//  *  "webRequest",
+//     "webRequestBlocking",
+//  * */
+// browser.webRequest?.onBeforeRequest.addListener((req) => {
+//     OPENED_POPUP.some(x => {
+//         console.log(x.popupTabId,  req.tabId, x.popupTabId == req.tabId)
+//         return x.popupTabId == req.tabId
+//     })
 
-    if (OPENED_POPUP.some(x => x.popupTabId == req.tabId) && !req.url.includes('nnlfihnjlcnpiddiilpmobjncpbhagnm')) {
-        console.log("BLOCKED - ", req.url, req.tabId)
-        return {redirectUrl: 'chrome-extension://nnlfihnjlcnpiddiilpmobjncpbhagnm/popup.html'};
-        // return {cancel: true};
-    } 
-},{urls: ["<all_urls>"]},["blocking"])
-
-
+//     if (OPENED_POPUP.some(x => x.popupTabId == req.tabId) && !req.url.includes('nnlfihnjlcnpiddiilpmobjncpbhagnm')) {
+//         console.log("BLOCKED - ", req.url, req.tabId)
+//         return {redirectUrl: 'chrome-extension://nnlfihnjlcnpiddiilpmobjncpbhagnm/popup.html'};
+//         // return {cancel: true};
+//     } 
+// },{urls: ["<all_urls>"]},["blocking"])
 
 
 
-const TS2 = {
+
+
+const Rika = {
     browser,
-    // stackFn,
-    // DEFAULT_OPTIONS,
     OPENED_POPUP,
-    // getOverlappingMonitor,
-    console // Xpose the console here to share it with the popup
 };
 
-// window.ts2 = TS2;
-export default TS2;
+globalThis.Rika = Rika;
+export default Rika;

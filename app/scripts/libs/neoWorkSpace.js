@@ -152,7 +152,7 @@ export class ws {
 
     this.refreshCounts()
     console.log(`Added URL : ${ url } to ${ this.name }`)
-    this.wsManager.save()
+    this.save()
   }
 
   update(urls) {
@@ -167,7 +167,7 @@ export class ws {
     })
     this.windows.push(_update)
     this.refreshCounts()
-    this.wsManager.save()
+    this.save()
   }
 
   remove(url) {
@@ -205,8 +205,9 @@ export class wsManager {
   name = "WSP_MANAGER"
 
   constructor() {
-    this.load()
+    // this.load()
     this.noSave = false
+    // this.initialized = false
   }
 
   add(_ws) {
@@ -236,6 +237,7 @@ export class wsManager {
   }
 
   reHydrate({ name = "", windows = [], winCount = 0, tabCount = 0 }) {
+    console.log("reHydrating... ", name, windows, winCount, tabCount, this)
     return new ws(name, windows, false, this)
   }
 
@@ -263,23 +265,25 @@ export class wsManager {
     return _all_ws_str
   }
 
-  load() {
-    (async ()=>{
-        this.noSave = true
-        const _all_ws_str = await localStorage.getItem(this.name)
+  async load() {
+    console.log("Loading wsManager");
+    // (async ()=>{
+    this.noSave = true
+    const _all_ws_str = await localStorage.getItem(this.name)
+    console.log("ASYNC Loading wsManager", _all_ws_str);
+    if (_all_ws_str ){
+        const saved = JSON.parse(_all_ws_str)
+        // console.log(saved)
 
-        if (_all_ws_str ){
-          const saved = JSON.parse(_all_ws_str)
-          // console.log(saved)
-
-          for (const [wsId, wsObj] of Object.entries(saved)) {
-            // console.log(wsId, wsObj)
-            this.reHydrate(wsObj)
-          }
-          console.log("reLoading wsManager =>", this.all)
+        for (const [wsId, wsObj] of Object.entries(saved)) {
+        console.log(wsId, wsObj)
+        this.reHydrate(wsObj)
         }
-        this.noSave = false
-    })()
+        console.log("reLoading wsManager =>", this.all)
+    }
+    this.noSave = false
+    // this.initialized = true
+    // })()
   }
 
   export() {
@@ -289,6 +293,10 @@ export class wsManager {
 
 }
 
+// TODO: refactor this - low priority (mv3)
 const WS_MANAGER = new wsManager()
+await WS_MANAGER.load() // no async constructors? => top level await FTW!
+
+console.log({WS_MANAGER})
 export default WS_MANAGER
 

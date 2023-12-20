@@ -22,7 +22,8 @@
     "storage",
     "contextMenus",
     "system.display",
-    "sidePanel"
+    "sidePanel",
+    "offscreen"
   ],
   "host_permissions": ["<all_urls>"],
   "web_accessible_resources": [
