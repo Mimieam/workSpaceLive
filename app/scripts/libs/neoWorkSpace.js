@@ -1,4 +1,4 @@
-import LZString from 'Lz-string'
+import { compressToUTF16 as lzStringCompress, decompressFromUTF16 as lzStringDecompress } from 'lz-string'
 import {localStorage} from './storage'
 import { openTab, currentDate } from './helpers'
 
@@ -11,7 +11,22 @@ import { openTab, currentDate } from './helpers'
  * ws.fromWindows(name)
  * */
 
-globalThis.LZString = LZString
+
+globalThis.lzStringCompress = lzStringCompress
+globalThis.lzStringDecompress = lzStringDecompress
+export const _stringifyAndCompress = (Obj, verbose=false) => {
+  const strData = JSON.stringify(Obj)
+  const compressed = lzStringCompress(strData)
+
+  if (verbose) {
+    console.log(strData)
+    console.log(compressed)
+  }
+  console.log("Initial Size: " + strData.length);
+  console.log("Compresseed Size: " + compressed.length);
+  return compressed
+}
+
 export class ws {
   static totalWSCount = 0
 
@@ -124,10 +139,7 @@ export class ws {
     let wsStr = JSON.stringify({ name: this.name, windows: this.windows })
 
     if (compress) {
-      console.log("Size of the data is: " + wsStr.length);
-      let compressed = LZString.compress(wsStr);
-      console.log("Size of compressed data is: " + compressed.length);
-      wsStr = compressed
+        wsStr = _stringifyAndCompress(wsStr, true)
     }
 
     if (toLocalStorage) {

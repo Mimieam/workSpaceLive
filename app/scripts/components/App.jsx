@@ -17,6 +17,8 @@ import { port, useChromeMessagePassing } from '../libs/onMessageHook'
 import {SearchBar} from './Search'
 import { ErrorHook } from './Error'
 import { TitleStrip } from './TitleStrip'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faWindowClose } from "@fortawesome/free-solid-svg-icons";
 
 let POPUP_INFO = []
 // let reload = 0
@@ -159,23 +161,25 @@ until that's solved, we can either pass the state to the child components or use
               { (provided, snapshot) => (
               <Fragment>
                   {/* <div className={ "windowTitle" }> WindowTitle { `${el[0]?.windowId}`} </div>   */}
-                <div className={ "windowTitle" }>  { `${el?.length}`} Tabs </div>
+                <div className={ "windowTitle windowStrip" }>  { `${el?.length}`} Tabs - <div className={"square_btn"}><FontAwesomeIcon icon={faWindowClose} size="lg"/></div> </div>
+                <div className="wrapperTopper"> </div>
                 <div
                   className={ "wrapper resizeThis" + `${snapshot.isDraggingOver? ' isDragging':'' }` }
                   ref={ provided.innerRef }
                   { ...provided.droppableProps }
-                >
-                  { el.map((item, index) => (
-                    <Tab
-                      key={ item.id }
-                      item={ item }
-                      index={ index }
-                      favIconUrl={ item.favIconUrl }
-                      provided={provided }
-                      snapshot={ snapshot}
-                    />
-                    )) }
-                    { provided.placeholder }
+                  >
+                    { el.map((item, index) => (
+                        <Tab
+                        key={ item.id }
+                        item={ item }
+                        index={ index }
+                        favIconUrl={ item.favIconUrl }
+                        provided={provided }
+                        snapshot={ snapshot}
+                        />
+                        )) }
+                        { provided.placeholder }
+
                 </div>
               </Fragment>
               ) }
@@ -195,13 +199,13 @@ until that's solved, we can either pass the state to the child components or use
 }
 
 // TODO: make this configurable - activeFocus
-document.addEventListener("mouseover", async () => {
-  // const w = await browser.windows.getCurrent()
-  // console.log('current w =', w)
-  console.log("POPUP_INFO - moouveOver=", POPUP_INFO)
-  const popupWindowId = POPUP_INFO?.popupWindowId
-  if (popupWindowId) {
-    port.postMessage({ BRING_FORWARD: `${ popupWindowId },${ 0 }`})
-  }
-  console.log("mouseover")
-})
+// document.addEventListener("mouseover", async () => {
+//   // const w = await browser.windows.getCurrent()
+//   // console.log('current w =', w)
+//   console.log("POPUP_INFO - moouveOver=", POPUP_INFO)
+//   const popupWindowId = POPUP_INFO?.popupWindowId
+//   if (popupWindowId) {
+//     port.postMessage({ BRING_FORWARD: `${ popupWindowId },${ 0 }`})
+//   }
+//   console.log("mouseover")
+// })

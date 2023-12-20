@@ -64,7 +64,7 @@ export const Tab_ = ({ item, index, ind, favIconUrl }) => {
 
 
 export const Tab = ({ item, index, ind, favIconUrl }) => {
-  console.log(item, favIconUrl)
+//   console.log(item, favIconUrl)
     return (
       <Draggable key={ item.id } draggableId={ `${ item.id }` } index={ index }>
         { (provided, snapshot) => {
