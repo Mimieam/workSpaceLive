@@ -25,6 +25,7 @@ anything above 800px and 600px width is ignored...
   --icon-size: 27px;
   --button-height:35px;
   --button-radius: 15px;
+  /* #9ba6d1 */
 }
 
 html { overflow-y: scroll }
@@ -111,6 +112,13 @@ html::-webkit-scrollbar {
   border-top-right-radius: 2px;
 }
 
+.windowStrip {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-left: 0.5em;
+}
+
 .resizeThis {
   resize: both;
   max-height: 400px;
@@ -135,9 +143,34 @@ html::-webkit-scrollbar {
   background: var(--main-color);
 }
 
+/* why does calling it topper is making me laugh so much 🤣
+ here we go put you little topper this wrapper 🤣 */
+.wrapperTopper {
+    /* background: var(--background-color);
+    height: 10px;
+    margin-top: 10px;
+    margin-bottom: -10px;
+    position: relative;
+    float: left;
+    margin-left: 3px;
+    width: 98%;
+    align-self: center;
+    border-radius: 1px; */
+    background: var(--background-color);
+    height: 5px;
+    margin-top: 8px;
+    margin-bottom: -10px;
+    position: relative;
+    float: left;
+    margin-left: 3px;
+    /* margin-right: inherit; */
+    width: 98%;
+    align-self: center;
+    border-radius: 1px;
+}
 .wrapper{
-  @apply border-solid border-l-4 rounded-lg my-2;
-  padding: 2px;
+  @apply border-solid border-l-4 rounded-lg;
+  /* padding: 2px;
   width: 100%;
   margin-bottom: 5px;
   background:var(--background-color);
@@ -145,6 +178,25 @@ html::-webkit-scrollbar {
   border-top-right-radius: 4px;
   border-color: var(--main-color);
   border-radius: 0.15em;
+  padding-top: 5px;
+  margin-top: 5px; */
+
+  border-radius: 0.5rem;
+  border-left-width: 4px;
+  border-style: solid;
+  padding: 2px;
+  width: 100%;
+  margin-bottom: 10px;
+  background: var(--background-color);
+  border-bottom-right-radius: 4px;
+  border-top-right-radius: 4px;
+  border-color: var(--main-color);
+  border-radius: 0.15em;
+  padding-top: 5px;
+  padding-bottom: 4px;
+  margin-top: 5px;
+
+  padding-right: 5px;  /* */
 }
 
 .wrapper.isDragging {
@@ -161,6 +213,7 @@ html::-webkit-scrollbar {
     position: fixed;
     /* background: var(--background-color); */
     width: 100%;
+    z-index: 100;
 }
 
 .appWrapper {

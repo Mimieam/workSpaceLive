@@ -8,14 +8,14 @@ import { timeout } from '../libs/utils'
 export const ErrorHook = (props) => {
   const {delay, message, dismiss} = props;
 
-  useEffect(async () =>{
-    const timer = setTimeout(()=>{
-      dismiss()
-    }, delay)
-    return () => {
-      clearTimeout(timer1)
-    }
-  }, [])
+  useEffect(()=>{
+    (async () =>{
+        const timer = setTimeout(()=>{dismiss()}, delay)
+        return () => {
+            clearTimeout(timer)
+        }
+    })()
+    }, [])
 
   const handleClick = ()=>{
     dismiss()

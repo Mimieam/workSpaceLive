@@ -14,11 +14,12 @@
     "service_worker": "background.js"
   },
   "action":{},
+  "side_panel": {
+    "default_path": "popup.html"
+  },
   "permissions": [
     "tabs",
     "activeTab",
-    "clipboardWrite",
-    "clipboardRead",
     "storage",
     "contextMenus",
     "system.display",
