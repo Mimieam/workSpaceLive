@@ -1,10 +1,9 @@
 # workSpaceLive
 
-  Create Open/Save workSpaces - in multiple contexts
+meh, Just a simple tab manager with a few twists 🤷🏽‍♂️🫡
 
-    a WorkeSpace ==> DragDropContext
-        a Window ==> Droppable
-           a Tab ==> Draggable
+<img width="805" alt="image" src="https://github.com/Mimieam/workSpaceLive/assets/834291/ddbfdfde-3d8d-44aa-b1aa-e121cdf4479d">
+
 
 ## [~ Functionalities ~]
   - context Menu - 
@@ -24,13 +23,14 @@
           - close -> delete_tab remove it from the Window ( auto update the WS)
           - open - bring in focus if Exist or Open a new Tab in the current Window
 
-  - UNDO - revert back to WS previous state
-
 
 ## [~ Extras ~] 
- - experimental-scope-hoisting => does the same a Optimization chunk for webpacks...
+- page activity timer - how long have I stayed and Interacted with a page? if less than 2 min - schedule for being closed in 15 min
 
-- parcel build app/manifest.json --no-source-maps --experimental-scope-hoisting --detailed-report 5 --bundle-node-modules
+- Create Open/Save workSpaces - in multiple contexts
 
-
-- page activity timer - how long have I stayed and Interacted with a page? if less than 2 min - schedule for being closed in 15 min 
+```
+    a WorkeSpace ==> DragDropContext
+        a Window ==> Droppable
+           a Tab ==> Draggable
+```
