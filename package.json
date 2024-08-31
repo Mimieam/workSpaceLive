@@ -55,14 +55,14 @@
 		"unused-webpack-plugin": "^2.4.0",
 		"web-ext": "4.2.0",
 		"webextension-polyfill": "^0.6.0",
-		"webpack": "^5.89.0",
+		"webpack": "^5.94.0",
 		"webpack-bundle-analyzer": "^4.10.1",
 		"webpack-cli": "^5.1.4",
 		"webpackbar": "^6.0.0"
 	},
 	"resolutions": {
 		"ws": "3.3.2",
-		"webpack": "5.89.0"
+		"webpack": "5.94.0"
 	},
 	"pnpm": {
 		"overrides": {
