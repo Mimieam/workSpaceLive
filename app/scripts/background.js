@@ -18,7 +18,8 @@ let portFromPOPUP;
 // browser.runtime.onConnect.addListener(handleMessagePassing);
 browser.runtime.onConnect.addListener((port) => {
     portFromPOPUP = port
-    port.onMessage.addListener(async (request) => {
+    // port.onMessage.addListener(async (request) => {
+    chrome.runtime.onMessage.addListener(async (request) => {
         console.log(request)
         if (request.GET_POPUP_INFO) {
             console.log("GET_POPUP_INFO:  ", request.GET_POPUP_INFO, console.log(OPENED_POPUP))
@@ -65,6 +66,11 @@ browser.runtime.onConnect.addListener((port) => {
             await browser.tabs.remove([tabId])
           }
 
+          if (request.CLOSE_WINDOW) {
+            const windowId = request.CLOSE_WINDOW
+            await browser.windows.remove(windowId)
+          }
+
     })
 })
 
@@ -83,8 +89,8 @@ chrome.action.onClicked.addListener(async() => {
 
     const parentConfig = {
         'width': parseInt(currentMonitor.width * (3 / 4)),
-        // 'height': currentMonitor.height,
-        'height': parseInt(currentMonitor.height * (4 / 5)),
+        'height': currentMonitor.height,
+        // 'height': parseInt(currentMonitor.height * (4 / 5)),
         // 'height': parseInt(currentMonitor.height * (2 / 4)),
         'left': currentMonitor.left,
         'top': currentMonitor.top

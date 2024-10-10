@@ -22,6 +22,8 @@ import { faWindowClose } from "@fortawesome/free-solid-svg-icons";
 
 let POPUP_INFO = []
 // let reload = 0
+
+
 export default function App() {
   // reload += 1
   const [state, setState] = useState([]);
@@ -145,7 +147,7 @@ until that's solved, we can either pass the state to the child components or use
 
       <div className="appHeader pt-2 pb-2 rounded-b bg-gray-900">
         <div className="appTitle font-light text-base pl-4 pt-2"
-          // onClick={ () => setIsSideBarOpen(!isSideBarOpen) }
+        //   onClick={ () => setIsSideBarOpen(!isSideBarOpen) }
         > <TitleStrip/> </div>
         <SearchBar
           state={state}
@@ -161,7 +163,24 @@ until that's solved, we can either pass the state to the child components or use
               { (provided, snapshot) => (
               <Fragment>
                   {/* <div className={ "windowTitle" }> WindowTitle { `${el[0]?.windowId}`} </div>   */}
-                <div className={ "windowTitle windowStrip" }>  { `${el?.length}`} Tabs - <div className={"square_btn"}><FontAwesomeIcon icon={faWindowClose} size="lg"/></div> </div>
+                <div className={ "windowTitle windowStrip" }>  { `${el?.length}`} Tabs -
+                    <div
+                        className={"square_btn"}
+                        onClick={()=>{
+                            const confirmed = confirm(`Continue closing ${el?.length} tabs?`);
+                            if (confirmed){
+                                try {
+                                  port.postMessage({ CLOSE_WINDOW: el[0]?.windowId})
+                                } catch (error) {
+                                  console.error(error)
+                                  chrome.runtime.sendMessage(chrome.runtime.id, { CLOSE_WINDOW: el[0]?.windowId }, (response)=>{console.log(`retried... with response = ${response}`)});
+                                }
+                            }
+                        }}
+
+                    >
+                        <FontAwesomeIcon icon={faWindowClose} size="lg"/></div>
+                </div>
                 <div className="wrapperTopper"> </div>
                 <div
                   className={ "wrapper resizeThis" + `${snapshot.isDraggingOver? ' isDragging':'' }` }
