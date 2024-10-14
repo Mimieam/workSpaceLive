@@ -37,7 +37,7 @@ export const get = (name) => new Promise((resolve, reject) => {
 export const ChromeRPC = {
   _getExtId: () => chrome.runtime.id,
   sendMessage: (params, fn) => {
-    // console.log(chrome.runtime.id)
+    console.log(chrome.runtime.id)
     chrome.runtime.sendMessage(chrome.runtime.id, params, fn);
   },
   onMessage: (MessageHandler) => {

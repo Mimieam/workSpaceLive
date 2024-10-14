@@ -8,7 +8,7 @@ export let port = browser.runtime.connect({ name: "portFromPopup" });
 
 
 export const handleMessagePassing = (setState, setFetchedTabs, setPopupWindow) => {
-
+  console.log(`handleMessagePassing - called...`)
 //  this notify the background to send the POPUP_INFO ...  because the popup.html does not know it's own window/tab ID
   port.postMessage({"GET_POPUP_INFO": "Popup is Open and Connected"})
 

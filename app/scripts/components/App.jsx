@@ -25,6 +25,11 @@ let POPUP_INFO = []
 
 
 export default function App() {
+
+  // ChromeRPC.sendMessage({rendering: true}, ()=>{
+  //   console.log('App Rerendering...')
+  // })
+
   // reload += 1
   const [state, setState] = useState([]);
 
@@ -51,7 +56,7 @@ until that's solved, we can either pass the state to the child components or use
   useChromeMessagePassing(setState, setFetchedTabs, setPopupWindow)
 
   useEffect(() => {
-    // console.log('Use effect-?')
+    console.log('Use effect- APP () ?')
     const fetchCurrentWindows = async () => {
       const windows = await browser.windows.getAll({ populate: true })
       const tabs = windows.map(w => w.tabs)

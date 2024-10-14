@@ -24,7 +24,8 @@
     "contextMenus",
     "system.display",
     "sidePanel",
-    "offscreen"
+    "offscreen",
+    "nativeMessaging"
   ],
   "host_permissions": ["<all_urls>"],
   "web_accessible_resources": [

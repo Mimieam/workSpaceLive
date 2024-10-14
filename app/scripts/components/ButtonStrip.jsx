@@ -8,16 +8,19 @@ import { port } from "../libs/onMessageHook";
 
 
 
-const onClickPinToggle = (tabId) => { 
-  return port.postMessage({ TOGGLE_PIN: `${ tabId }`})
+const onClickPinToggle = (tabId) => {
+  // return port.postMessage({ TOGGLE_PIN: `${ tabId }`})
+
+  return ChromeRPC.sendMessage({ TOGGLE_PIN: `${tabId}` }, (data) => console.log(data))
 }
 const onClickBringForward = (windowId, tabIndex) => {
-  return port.postMessage({ BRING_FORWARD: `${ windowId },${ tabIndex}`})
-  // return ChromeRPC.sendMessage({ BRING_FORWARD: `${ windowId },${ tabIndex}`}, (data) => console.log(data))
+
+  // return port.postMessage({ BRING_FORWARD: `${ windowId },${ tabIndex}`})
+  return ChromeRPC.sendMessage({ BRING_FORWARD: `${ windowId },${ tabIndex}`}, (data) => console.log(data))
 }
 const onClickClose = (tabId, windowId) => {
-  return port.postMessage({ CLOSE_TAB: `${ tabId },${ windowId }`})
-  // return ChromeRPC.sendMessage({ CLOSE_TAB: `${ tabId },${ windowId }`}, (data) => console.log(data))
+  // return port.postMessage({ CLOSE_TAB: `${ tabId },${ windowId }`})
+  return ChromeRPC.sendMessage({ CLOSE_TAB: `${ tabId },${ windowId }`}, (data) => console.log(data))
 }
 
 

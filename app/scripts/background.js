@@ -8,6 +8,12 @@ import './libs/contextMenu'
 import './libs/bgEvents'
 
 
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('BG::', message, sender)
+  sendResponse('Got It...');
+
+});
+
 let DEBUG = true
 let OPENED_POPUP = []
 let __clipboardContent = ''

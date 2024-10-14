@@ -6,7 +6,7 @@
 		"cleanup": "rm -rf .cache dist",
 		"build": "web-ext build --overwrite-dest --source-dir ./dist",
 		"start": "npm run serve & npm run start:chrome",
-		"serve": "npm run cleanup && webpack build --env production",
+		"serve": "npm run cleanup & webpack build --env production --watch",
 		"start:chrome": "web-ext run --source-dir ./dist --target chromium",
 		"start:firefox": "web-ext run --source-dir ./dist --target firefox-desktop"
 	},
@@ -24,7 +24,7 @@
 		"lz-string": "^1.4.4",
 		"moment": "^2.26.0",
 		"react-beautiful-dnd": "^13.0.0",
-		"recoil": "^0.1.2",
+		"recoil": "0.1.2",
 		"systeminformation": "^5.21.20"
 	},
 	"devDependencies": {

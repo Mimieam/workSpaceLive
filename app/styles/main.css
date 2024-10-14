@@ -122,8 +122,12 @@ html::-webkit-scrollbar {
 .resizeThis {
   resize: both;
   max-height: 400px;
-  margin-right: 10px;
-  overflow:scroll;
+  /* margin-right: 10px; */
+  overflow:auto;
+  scrollbar-color: var(--main-color) var(--background-color);
+  scrollbar-width: thin;
+  clip-path: inset(0 round 4px);
+  padding-right: 0 !important;
 }
 
 .tab {
