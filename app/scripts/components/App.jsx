@@ -19,6 +19,7 @@ import { ErrorHook } from './Error'
 import { TitleStrip } from './TitleStrip'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWindowClose } from "@fortawesome/free-solid-svg-icons";
+import { injectCustomConfirm } from "./customConfirm";
 
 let POPUP_INFO = []
 // let reload = 0
@@ -70,13 +71,15 @@ until that's solved, we can either pass the state to the child components or use
   }, []);
 
   const format = (state, sInd, dInd, source, destination) => {
+    console.log({source})
     const sourceTabId = state[sInd][source.index]?.id
     const sourceTabIndex = source.index
     const destinationWindowId = state[dInd]? state[dInd][0]?.windowId: ''
     const destinationTabIndex = destination?.index
 
     if (!isSearching){
-      port.postMessage({ MOVE_TAB: `${ sourceTabId }, ${ sourceTabIndex }, ${ destinationWindowId }, ${ destinationTabIndex }` })
+      // port.postMessage({ MOVE_TAB: `${ sourceTabId }, ${ sourceTabIndex }, ${ destinationWindowId }, ${ destinationTabIndex }` })
+      browser.runtime.sendMessage({ MOVE_TAB: `${ sourceTabId }, ${ sourceTabIndex }, ${ destinationWindowId }, ${ destinationTabIndex }` })
       console.log("MOVE_TAB")
 
     } else {
@@ -90,11 +93,20 @@ until that's solved, we can either pass the state to the child components or use
     }
   }
 
+  function getTabFromState(state, sInd, source) {
+    const t = state[sInd][source.index]
+    return t
+  }
 
   async function onDragEnd(result) {
     // state = state.filter(w=>w.length)
     const { source, destination } = result;
     console.log(source, destination)
+
+    const t = getTabFromState(state, +source.droppableId, source)
+
+    if (t?.pinned) return
+
     // dropped outside the list
     if (!destination) {
       let sInd = +source.droppableId;
@@ -171,17 +183,20 @@ until that's solved, we can either pass the state to the child components or use
                 <div className={ "windowTitle windowStrip" }>  { `${el?.length}`} Tabs -
                     <div
                         className={"square_btn"}
-                        onClick={()=>{
-                            const confirmed = confirm(`Continue closing ${el?.length} tabs?`);
-                            if (confirmed){
-                                try {
-                                  port.postMessage({ CLOSE_WINDOW: el[0]?.windowId})
-                                } catch (error) {
-                                  console.error(error)
-                                  chrome.runtime.sendMessage(chrome.runtime.id, { CLOSE_WINDOW: el[0]?.windowId }, (response)=>{console.log(`retried... with response = ${response}`)});
-                                }
-                            }
-                        }}
+                        onClick={
+                          () => {
+                            injectCustomConfirm(
+                              `Are you sure you want to proceed with closing  ${ el?.length } tabs?`,
+                              () => {
+                                chrome.runtime.sendMessage({ CLOSE_WINDOW: el[0]?.windowId})
+                                console.log("User clicked Confirm!")
+                              },
+                              () => {
+                                console.log("User clicked Cancel!")
+                              }
+                            );
+                          }
+                        }
 
                     >
                         <FontAwesomeIcon icon={faWindowClose} size="lg"/></div>

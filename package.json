@@ -48,7 +48,7 @@
 		"swc-loader": "^0.2.3",
 		"tailwindcss": "^3.3.6",
 		"unused-webpack-plugin": "^2.4.0",
-		"web-ext": "4.2.0",
+		"web-ext": "10.4.0",
 		"webextension-polyfill": "^0.6.0",
 		"webpack": "^5.89.0",
 		"webpack-bundle-analyzer": "^4.10.1",

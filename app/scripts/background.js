@@ -8,8 +8,61 @@ import './libs/contextMenu'
 import './libs/bgEvents'
 
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener( async (message, sender, sendResponse) => {
   console.log('BG::', message, sender)
+
+        console.log(message)
+        if (message.GET_POPUP_INFO) {
+            console.log("GET_POPUP_INFO:  ", message.GET_POPUP_INFO, console.log(OPENED_POPUP))
+            await portFromPOPUP.postMessage({ POPUP_INFO: JSON.stringify(...OPENED_POPUP) })
+          }
+
+          // messages to background <==
+          if (message.MOVE_TAB) {
+            const data = message.MOVE_TAB
+            const [tabId, sI, wId, tIdx] = data.split(',').map(x => +x)
+            if (wId)
+              await browser.tabs.move([tabId], { windowId: wId, index: tIdx || -1 })
+            else
+              await browser.windows.create({ tabId: tabId })
+            return
+          }
+
+          if (message.TOGGLE_PIN) {
+            const data = message.TOGGLE_PIN
+            const [tabId, ..._] = data.split(',').map(x => +x)
+            browser.tabs.update(tabId, { pinned: !(await browser.tabs.get(tabId))?.pinned })
+            return
+          }
+
+          if (message.BRING_FORWARD) {
+            // console.log(message.BRING_FORWARD)
+            const data = message.BRING_FORWARD
+            const [windowId, tabIndex] = data.split(',').map(x => +x)
+            await browser.windows.update(windowId, {focused: true})
+            await browser.tabs.highlight({ windowId: windowId, tabs: tabIndex })
+            const lastID = (await browser.windows.getLastFocused())?.id
+            // console.log(`lastID = ${lastID}`)
+            // console.log(`OPENED_POPUP =`, OPENED_POPUP)
+            const { popupWindowId, parentId } = OPENED_POPUP[0]
+
+            await browser.windows.update(popupWindowId, {focused: true})
+            await browser.tabs.highlight({ windowId: popupWindowId, tabs: 0 })
+            // console.log(`popupWindowId = ${popupWindowId}`)
+          }
+
+          if (message.CLOSE_TAB) {
+            const data = message.CLOSE_TAB
+            const [tabId, ..._] = data.split(',').map(x => +x)
+            await browser.tabs.remove([tabId])
+          }
+
+          if (message.CLOSE_WINDOW) {
+            const windowId = message.CLOSE_WINDOW
+            await browser.windows.remove(windowId)
+          }
+
+
   sendResponse('Got It...');
 
 });
@@ -24,8 +77,8 @@ let portFromPOPUP;
 // browser.runtime.onConnect.addListener(handleMessagePassing);
 browser.runtime.onConnect.addListener((port) => {
     portFromPOPUP = port
-    // port.onMessage.addListener(async (request) => {
-    chrome.runtime.onMessage.addListener(async (request) => {
+    port.onMessage.addListener(async (request) => {
+    // chrome.runtime.onMessage.addListener(async (request) => {
         console.log(request)
         if (request.GET_POPUP_INFO) {
             console.log("GET_POPUP_INFO:  ", request.GET_POPUP_INFO, console.log(OPENED_POPUP))

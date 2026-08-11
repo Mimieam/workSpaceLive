@@ -199,7 +199,7 @@ export class ws {
 
 
 export const formatName = (name) => {
-  let _name = name.trim().toLowerCase()
+  let _name = `${name}`.trim().toLowerCase()
   return _name[0].toUpperCase() + _name.slice(1)
 }
 
